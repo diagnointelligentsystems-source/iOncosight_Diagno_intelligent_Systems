@@ -27,9 +27,9 @@ import time
 from streamlit_autorefresh import st_autorefresh
 
 # 🔄 Auto-refresh every 5 seconds
-st_autorefresh(interval=5000, key="memory_check")
+#st_autorefresh(interval=50000, key="memory_check")
 
-st.title("Memory Monitor with Auto-Restart")
+#st.title("Memory Monitor with Auto-Restart")
 
 def check_memory_and_restart(threshold=95):
     mem_usage = psutil.virtual_memory().percent
