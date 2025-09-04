@@ -20,7 +20,7 @@ import gc
 # Set Hugging Face token safely
 # ----------------------------
 hf_token = st.secrets["HF_TOKEN"]
-os.environ["HUGGINGFACE_HUB_TOKEN"] = hf_toke
+os.environ["HUGGINGFACE_HUB_TOKEN"] = hf_token
 
 # ----------------------------
 # Deep Learning Models
