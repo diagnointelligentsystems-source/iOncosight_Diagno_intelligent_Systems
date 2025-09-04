@@ -168,7 +168,7 @@ if "run_count" not in st.session_state:
     st.session_state.run_count = 0
 
 st.session_state.run_count += 1
-st.write(f"Run count: {st.session_state.run_count}")
+#st.write(f"Run count: {st.session_state.run_count}")
 
 # ✅ Every 3 runs, clear temporary memory (not model)
 import gc, tensorflow as tf
