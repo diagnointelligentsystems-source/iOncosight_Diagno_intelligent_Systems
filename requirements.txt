@@ -19,3 +19,4 @@ tqdm
 huggingface-hub>=0.16.4
 opencv-python-headless
 psutil
+streamlit-autorefresh
