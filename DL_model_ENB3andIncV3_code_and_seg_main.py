@@ -812,6 +812,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     #df = pd.DataFrame(region_rows)
     #df.to_csv("./output_poly_feret/region_stats_with_class.csv", index=False)
     #print(df)
+    has_mass = has_copd = False
     if os.path.exists(os.path.join(current_dir, "output_poly_feret", "region_stats_with_class.csv")):
         from pandas.errors import EmptyDataError
 
@@ -938,6 +939,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
