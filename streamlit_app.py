@@ -20,29 +20,8 @@ import gc
 # Set Hugging Face token safely
 # ----------------------------
 hf_token = st.secrets["HF_TOKEN"]
-os.environ["HUGGINGFACE_HUB_TOKEN"] = hf_token
+os.environ["HUGGINGFACE_HUB_TOKEN"] = hf_toke
 
-import psutil
-import time
-from streamlit_autorefresh import st_autorefresh
-
-# 🔄 Auto-refresh every 5 seconds
-#st_autorefresh(interval=50000, key="memory_check")
-
-#st.title("Memory Monitor with Auto-Restart")
-
-def check_memory_and_restart(threshold=95):
-    mem_usage = psutil.virtual_memory().percent
-    if mem_usage > threshold:
-        st.warning(f"Memory usage high ({mem_usage}%). Restarting app...")
-        time.sleep(2)  # short delay so message appears
-        st.rerun()
-    return mem_usage
-
-# ✅ Run memory check each time app refreshes
-mem = check_memory_and_restart()
-
-st.write(f"Current memory usage: {mem}%")
 # ----------------------------
 # Deep Learning Models
 # ----------------------------
