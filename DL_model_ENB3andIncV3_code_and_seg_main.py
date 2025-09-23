@@ -371,7 +371,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         except Exception as e:
             print(f"❌ Failed to register hook: {e}")
             
-        results = model(image_path, conf=0.2, iou=0.5, imgsz=512, device="cpu")
+        results = model(image_path, conf=0.2, iou=0.5, imgsz=1024, device="cpu")
         print('ex 1_2_3')
         result = results[0]
         print('ex 1_3')
@@ -944,6 +944,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
