@@ -319,6 +319,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ########################## segmentation model
     output_path = "./images_YOLOV11/V11_input.png"
     try: #if 1==1:#predicted_value[0]!=1:
+        print('ex 1_1')
         from PIL import Image
         # Load best model
         # Class mapping
@@ -329,13 +330,13 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             "COPD": (0, 165, 255),     # Orange
             "Normal": (0, 255, 0)      # Green
         }
-
+        
         # Transparency factor
         alpha = 0.4
         results=[]
         # Load best model
         cwd = os.getcwd()
-        #print("Current working directory:", cwd)
+        print("Current working directory:", cwd)
         # Set directory
         #from ultralytics import YOLO
         model = yolov11 #YOLO(yolov11)#"./yolov11_seg_MCN_best.pt")
@@ -348,13 +349,13 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 
         # Copy image
         shutil.copy(image_path, output_path)
-
+        print('ex 1_2')
         output_path = "./output_YOLOV11/V11_SEG_PRED.png"
 
         # Run inference
         results = model(image_path, conf=0.2, iou=0.5, imgsz=1024)
         result = results[0]
-
+        print('ex 1_13)
         # Read original image
         img=img_p = cv2.imread(image_path)
         #img = cv2.imread(image_path)
@@ -362,6 +363,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             raise FileNotFoundError(f"Image not found: {image_path}")
         #print('*0')
         # Run inference
+        print('ex 1_4')
         if result.masks is None:   # ✅ check before using
             #print('*1')
             results = model(image_path, conf=0.3, iou=0.5, imgsz=1024)
@@ -377,6 +379,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 #print('*2###############################################')
         #print(sfdsfsgag)
         ###### feature extraction
+        print('ex 1_5')
         import torch
         from tqdm import tqdm
 
@@ -395,18 +398,19 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         try:
             hook = model.model.model[10].register_forward_hook(hook_fn)
         except Exception as e:
-            print(f"❌ Failed to register hook: {e}")
+            print(f"❌ Failed to register hook: {e}")\
+        print('ex 1_6')
         def extract_features_from_txt(image_folder, save_csv_path):
             data = []
             all_images = sorted(os.listdir(image_folder))
-
+            print('ex 1_7')
             for filename in tqdm(all_images, desc=f"Extracting from {os.path.basename(image_folder)}"):
                 if not filename.lower().endswith(('.png', '.jpg', '.jpeg')): continue
 
                 img_path = os.path.join(image_folder, filename)
                 #label_path = os.path.join(label_folder, filename.replace('.png', '.txt').replace('.jpg', '.txt'))
                 main_class=10
-
+                print('ex 1_8')
                 try:
                     _ = model(img_path)
                     feat = features_dict.get('feat')
@@ -416,17 +420,22 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                     if feat is not None:
                         row = [filename, main_class] + feat.tolist()
                         data.append(row)
+                    print('ex 1_9')
                 except Exception as e:
                     print(f"❌ Error processing {filename}: {e}")
 
             # Save CSV
             if data:
+                print('ex 1_10')
                 columns = ['filename', 'label'] + [f'feat_{i}' for i in range(len(data[0]) - 2)]
                 df = pd.DataFrame(data, columns=columns)
                 df.to_csv(save_csv_path, index=False)
                 #print(f"✅ Saved features to {save_csv_path}")
+                print('ex 1_11')
             else:
+                print('ex 1_12')
                 print("⚠️ No data was extracted.")
+        print('ex 1_13')
         extract_features_from_txt(
             image_folder='./images_YOLOV11',
             save_csv_path='./yolov11_MCN_whole_features_test.csv'
