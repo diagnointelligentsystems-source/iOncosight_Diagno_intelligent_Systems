@@ -976,11 +976,13 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
       shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
     plt.close('all')
     del results
+    del model
     gc.collect()
-    print('ex 9')
+    print('ex 9','Analysis completed')
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
