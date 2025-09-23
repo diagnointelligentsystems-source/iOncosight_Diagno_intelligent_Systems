@@ -385,11 +385,13 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         print('ex 1_4')
         if result.masks is None:   # ✅ check before using
             print('*1')
+            results=result=[]
             results = model(image_path, conf=0.2, iou=0.5, imgsz=256, device="cpu")
             result = results[0]
             # if result.masks is not None:
             #     print('*11')
         if result.masks is None:   # ✅ check before using
+            results=result=[]
             results = model(image_path, conf=0.05, iou=0.5, imgsz=256, device="cpu")
             result = results[0]
             print('*22')
@@ -399,8 +401,6 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         #print(sfdsfsgag)
         ###### feature extraction
         print('ex 1_5')
-
-
         # Extract features directly from the hook
         feat = features_dict.get('feat')
         if feat is not None:
@@ -944,6 +944,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
