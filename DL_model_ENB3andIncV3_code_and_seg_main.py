@@ -398,7 +398,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         try:
             hook = model.model.model[10].register_forward_hook(hook_fn)
         except Exception as e:
-            print(f"❌ Failed to register hook: {e}")\
+            print(f"❌ Failed to register hook: {e}")
         print('ex 1_6')
         def extract_features_from_txt(image_folder, save_csv_path):
             data = []
@@ -969,6 +969,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
