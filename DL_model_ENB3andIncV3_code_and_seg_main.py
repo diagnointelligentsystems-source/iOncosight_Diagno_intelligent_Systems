@@ -356,7 +356,21 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         # Run inference
         img_samp = cv2.imread(image_path)
         print('image_path :',image_path)
-        print("img_samp shape:", img_samp.shape) 
+        print("img_samp shape:", img_samp.shape)
+        import torch
+        from tqdm import tqdm
+
+        features_dict = {}
+
+        def hook_fn(module, input, output):
+            pooled = torch.mean(output[0], dim=(1, 2))  # Global Average Pooling
+            features_dict['feat'] = pooled.detach().cpu().numpy()
+
+        try:
+            hook = model.model.model[10].register_forward_hook(hook_fn)
+        except Exception as e:
+            print(f"❌ Failed to register hook: {e}")
+            
         results = model(image_path, conf=0.3, iou=0.5, imgsz=512, device="cpu")
         print('ex 1_2_3')
         result = results[0]
@@ -385,71 +399,18 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         #print(sfdsfsgag)
         ###### feature extraction
         print('ex 1_5')
-        import torch
-        from tqdm import tqdm
 
-        # === Load trained YOLOv10 model ===
-        model.eval()
 
-        # === Hook to extract backbone features ===
-        features_dict = {}
-
-        def hook_fn(module, input, output):
-            pooled = torch.mean(output[0], dim=(1, 2))  # Global Average Pooling
-            features_dict['feat'] = pooled.detach().cpu().numpy()
-
-        # You might need to adjust this index based on your model structure
-        #hook = model.model.model[10].register_forward_hook(hook_fn)
-        try:
-            hook = model.model.model[10].register_forward_hook(hook_fn)
-        except Exception as e:
-            print(f"❌ Failed to register hook: {e}")
-        print('ex 1_6')
-        def extract_features_from_txt(image_folder, save_csv_path):
-            data = []
-            all_images = sorted(os.listdir(image_folder))
-            print('ex 1_7')
-            kioa=0
-            for filename in tqdm(all_images, desc=f"Extracting from {os.path.basename(image_folder)}"):
-                if not filename.lower().endswith(('.png', '.jpg', '.jpeg')): 
-                  continue
-                kioa+=1
-                if kioa>1:
-                  break
-
-                img_path = os.path.join(image_folder, filename)
-                #label_path = os.path.join(label_folder, filename.replace('.png', '.txt').replace('.jpg', '.txt'))
-                main_class=10
-                print('ex 1_8')
-                try:
-                    _ = model(img_path, imgsz=256, device="cpu")
-                    feat = features_dict.get('feat')
-                    if feat is None:
-                        print(f"⚠️ Feature not extracted for {filename}")
-                        continue
-                    print(f"✅ Feature length for {filename}: {feat.shape}")
-                    row = [filename, main_class] + feat.tolist()
-                    data.append(row)
-                    print('ex 1_9')
-                except Exception as e:
-                    print(f"❌ Error processing {filename}: {e}")
-
-            # Save CSV
-            if data:
-                print('ex 1_10')
-                columns = ['filename', 'label'] + [f'feat_{i}' for i in range(len(data[0]) - 2)]
-                df = pd.DataFrame(data, columns=columns)
-                df.to_csv(save_csv_path, index=False)
-                #print(f"✅ Saved features to {save_csv_path}")
-                print('ex 1_11')
-            else:
-                print('ex 1_12')
-                print("⚠️ No data was extracted.")
-        print('ex 1_13')
-        extract_features_from_txt(
-            image_folder='./images_YOLOV11',
-            save_csv_path='./yolov11_MCN_whole_features_test.csv'
-        )
+        # Extract features directly from the hook
+        feat = features_dict.get('feat')
+        if feat is not None:
+            print(f"✅ Feature length: {feat.shape}")
+            # Save to CSV
+            row = [os.path.basename(image_path), 10] + feat.tolist()
+            df = pd.DataFrame([row], columns=['filename', 'label'] + [f'feat_{i}' for i in range(len(feat))])
+            df.to_csv('./yolov11_MCN_whole_features_test.csv', index=False)
+        else:
+            print("⚠️ Feature was not extracted.")
         print('ex 2')
         ######### ML results
         import ens_modelling_MCN_test_fn
