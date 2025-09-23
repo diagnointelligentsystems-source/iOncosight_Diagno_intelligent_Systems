@@ -386,7 +386,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         if result.masks is None:   # ✅ check before using
             print('*1')
             results=result=[]
-            results = model(image_path, conf=0.1, iou=0.5, imgsz=256, device="cpu")
+            results = model(image_path, conf=0.1, iou=0.5, imgsz=1024, device="cpu")
             result = results[0]
             # if result.masks is not None:
             #     print('*11')
@@ -944,6 +944,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
