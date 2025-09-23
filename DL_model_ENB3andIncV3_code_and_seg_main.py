@@ -384,7 +384,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         # Run inference
         print('ex 1_4')
         if result.masks is None:   # ✅ check before using
-            #print('*1')
+            print('*1')
             results = model(image_path, conf=0.2, iou=0.5, imgsz=256, device="cpu")
             result = results[0]
             # if result.masks is not None:
@@ -392,10 +392,10 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         if result.masks is None:   # ✅ check before using
             results = model(image_path, conf=0.05, iou=0.5, imgsz=256, device="cpu")
             result = results[0]
-            #print('*22')
+            print('*22')
             if result.masks is None:
                 print(" No segmentation detected even after multiple inference attempts.")
-                #print('*2###############################################')
+                print('*2###############################################')
         #print(sfdsfsgag)
         ###### feature extraction
         print('ex 1_5')
@@ -943,6 +943,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
