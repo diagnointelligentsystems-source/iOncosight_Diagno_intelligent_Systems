@@ -354,6 +354,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         print('ex 1_2_1')
         # Run inference
         img_samp = cv2.imread(image_path)
+        print('image_path :',image_path)
         print("img_samp shape:", img_samp.shape) 
         results = model(image_path, conf=0.2, iou=0.5, imgsz=1024, device="cpu")
         print('ex 1_2_3')
@@ -378,7 +379,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             result = results[0]
             #print('*22')
             if result.masks is None:
-                print("⚠️ No segmentation detected even after multiple inference attempts.")
+                print(" No segmentation detected even after multiple inference attempts.")
                 #print('*2###############################################')
         #print(sfdsfsgag)
         ###### feature extraction
@@ -972,6 +973,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
