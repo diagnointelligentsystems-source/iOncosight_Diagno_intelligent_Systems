@@ -411,6 +411,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             df.to_csv('./yolov11_MCN_whole_features_test.csv', index=False)
         else:
             print("⚠️ Feature was not extracted.")
+        model = yolov11=[]
         print('ex 2')
         ######### ML results
         import ens_modelling_MCN_test_fn
@@ -944,6 +945,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
