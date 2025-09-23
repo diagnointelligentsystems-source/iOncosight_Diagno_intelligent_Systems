@@ -101,7 +101,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         eff_layer_index=-2,   # adjust if needed
         inc_layer_index=-2    # adjust if needed
     )
-
+    
     #print(features_df.head())
     features_df.to_csv("./DL_model_ENB3andIncV3/combined_conv_features.csv", index=False)
     #print('saved')
@@ -166,9 +166,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         #############    ML model
 
     # Load data
-    file_path ="./DL_model_ENB3andIncV3/combined_conv_features.csv"
-    #"E:/project_new/Project_MCN_code/Features_ML_model_inc/inc_V3_20d_8b_LC_mass_others_features_whole_combined.csv"
-    #file_path = "D:/clavicle_new_mes_reg_score3/Female_3pt_1pt_new_measurement _whole.xlsx"
+    file_path ="./DL_model_ENB3andIncV3/combined_conv_features.csv" 
     data1  = pd.read_csv(file_path)
     X = data1.iloc[:1,2:]   #independent columns
     #print(X)
@@ -317,6 +315,8 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('predicted_value[0]',predicted_value[0])
     plt.close('all')
     print('ex 1')
+    ####
+    eff_model=inc_model=[]
     ########################## segmentation model
     output_path = "./images_YOLOV11/V11_input.png"
     try: #if 1==1:#predicted_value[0]!=1:
@@ -944,6 +944,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
