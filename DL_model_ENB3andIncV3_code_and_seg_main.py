@@ -408,7 +408,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             data = []
             all_images = sorted(os.listdir(image_folder))
             print('ex 1_7')
-          kioa=0
+            kioa=0
             for filename in tqdm(all_images, desc=f"Extracting from {os.path.basename(image_folder)}"):
                 if not filename.lower().endswith(('.png', '.jpg', '.jpeg')): 
                   continue
@@ -978,4 +978,5 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
