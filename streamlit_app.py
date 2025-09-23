@@ -1151,7 +1151,7 @@ with col1:
             if image:
                 # Create image container with better styling
                 # st.markdown('<div class="image-container">', unsafe_allow_html=True)
-                st.image(image, caption="📷 Uploaded Medical Image", use_container_width=True)
+                st.image(image, caption="📷 Uploaded Medical Image",  width="stretch")
                 st.markdown('</div>', unsafe_allow_html=True)
             else:
                 st.error("❌ Failed to load the uploaded image. Please check the file format.")
@@ -1170,7 +1170,7 @@ with col1:
                 </div>
                 """, unsafe_allow_html=True)
 
-    if st.button("🔍 Analyze Image", disabled=(uploaded_file is None), use_container_width=True):
+    if st.button("🔍 Analyze Image", disabled=(uploaded_file is None),  width="stretch"):
         st.session_state.processing = True
         st.rerun()
 with col2:
@@ -1312,9 +1312,9 @@ with col2:
         # Display enhanced result with better placeholder
         # st.markdown('<div class="image-container">', unsafe_allow_html=True)
         # img = Image.open("result.jpg")
-        st.image("result.jpg", caption="🤖 AI Analysis Visualization", use_container_width=True)
+        st.image("result.jpg", caption="🤖 AI Analysis Visualization",  width="stretch")
         # st.image("result.jpg",
-        # caption="🤖 AI Analysis Visualization", use_container_width=True)
+        # caption="🤖 AI Analysis Visualization",  width="stretch")
         st.markdown('</div>', unsafe_allow_html=True)
 
         # Enhanced metrics display
@@ -1331,10 +1331,10 @@ with col2:
         # Enhanced action buttons
         col_a, col_b, col_c = st.columns([1, 1, 1])
         with col_a:
-            if st.button("📋 View Report", use_container_width=True):
+            if st.button("📋 View Report",  width="stretch"):
                 st.session_state.show_report = True
         with col_b:
-            if st.button("💾 Download", use_container_width=True):
+            if st.button("💾 Download",  width="stretch"):
                 # Enhanced report generation
                 report_text = f"""
 
@@ -1369,10 +1369,10 @@ Report ID: {st.session_state.report_data['patient_id']}-{datetime.now().strftime
                     data=report_text,
                     file_name=f"iOncoSight_report_{st.session_state.report_data['patient_id']}.txt",
                     mime="text/plain",
-                    use_container_width=True
+                     width="stretch"
                 )
         with col_c:
-            if st.button("🔄 New Analysis", use_container_width=True):
+            if st.button("🔄 New Analysis",  width="stretch"):
                 st.session_state.uploaded_file = None
                 st.session_state.processed_result = None
                 st.session_state.report_data = None
@@ -1447,7 +1447,7 @@ feedback_text = st.text_area(
 col_submit1, col_submit2, col_submit3 = st.columns([1, 1, 1])
 
 with col_submit1:
-    if st.button("📤 Submit Feedback", use_container_width=True):
+    if st.button("📤 Submit Feedback",  width="stretch"):
         if feedback_text.strip():
             # Save feedback to session history
             feedback_entry = {
@@ -1473,7 +1473,7 @@ with col_submit1:
             st.warning("⚠️ Please enter your feedback before submitting.")
 
 with col_submit2:
-    if st.button("🔄 Clear Form", use_container_width=True):
+    if st.button("🔄 Clear Form",  width="stretch"):
         st.rerun()
 
 with col_submit3:
