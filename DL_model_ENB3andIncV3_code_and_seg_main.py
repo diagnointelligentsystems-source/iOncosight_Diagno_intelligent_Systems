@@ -353,7 +353,9 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         output_path = "./output_YOLOV11/V11_SEG_PRED.png"
         print('ex 1_2_1')
         # Run inference
-        results = model(image_path, conf=0.2, iou=0.5, imgsz=1024)
+        img_samp = cv2.imread(image_path)
+        print("img_samp shape:", img_samp.shape) 
+        results = model(image_path, conf=0.2, iou=0.5, imgsz=1024, device="cpu")
         print('ex 1_2_3')
         result = results[0]
         print('ex 1_3')
@@ -970,6 +972,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
