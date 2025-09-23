@@ -64,6 +64,9 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         # Preprocess for each
         img_eff = preprocess_image(img_path, img_size=300)
         img_inc = preprocess_image(img_path, img_size=299)
+        ### model predction alone
+        eff_pred = eff_model.predict(img_eff, verbose=0)[0]  # EfficientNet prediction
+        inc_pred = inc_model.predict(img_inc, verbose=0)[0]
 
         # EfficientNet features
         eff_layer = eff_model.layers[eff_layer_index].name
@@ -90,17 +93,21 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         df.insert(1, "label", dummy_label)
 
         #print(f"✅ Extracted EfficientNet layer: {eff_layer}, Inception layer: {inc_layer}")
-        return df,img_eff
+        return df,img_eff,eff_pred,inc_pred
 
     # ================================
     # Example
     # ================================
-    features_df,img_eff = extract_features_dual(
+    features_df,img_eff,eff_pred,inc_pred = extract_features_dual(
         img_path, eff_model, inc_model,
         dummy_label="TestImage",
         eff_layer_index=-2,   # adjust if needed
         inc_layer_index=-2    # adjust if needed
     )
+    print ('#****************************************')
+    print('efficientNetB3', eff_pred, 'InceptionV3', inc_pred)
+    print( '# ****************************************')
+
     
     #print(features_df.head())
     features_df.to_csv("./DL_model_ENB3andIncV3/combined_conv_features.csv", index=False)
@@ -311,6 +318,8 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print("Probability scores:", predicted_proba_DL)
     max_confidence_ML=predicted_proba_DL
     if (X_stack[0])[0]==0 and (X_stack[0])[2]==0:
+        predicted_value[0]=0
+    if (X_stack[0])[0]==0 and (X_stack[0])[1]==0 and eff_pred[0]>=0.5 and inc_pred[0]>=0.5:
         predicted_value[0]=0
     print('predicted_value[0]',predicted_value[0])
     plt.close('all')
@@ -940,11 +949,14 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     del results
     del result
     del model
+    del df
+    del img, img1, img2
     gc.collect()
     print('ex 9','Analysis completed')
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
