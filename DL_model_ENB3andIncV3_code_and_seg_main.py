@@ -416,7 +416,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 main_class=10
                 print('ex 1_8')
                 try:
-                    _ = model(img_path)
+                    _ = model(img_path,imgsz=512, device="cpu")
                     feat = features_dict.get('feat')
                     if feat is None:
                         print(f"⚠️ Feature not extracted for {filename}")
@@ -973,6 +973,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
