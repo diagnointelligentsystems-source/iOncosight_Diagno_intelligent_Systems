@@ -317,7 +317,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     plt.close('all')
     ########################## segmentation model
     output_path = "./images_YOLOV11/V11_input.png"
-    if 1==1:#predicted_value[0]!=1:
+    try: if 1==1:#predicted_value[0]!=1:
         from PIL import Image
         # Load best model
         # Class mapping
@@ -506,11 +506,11 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         #print(f"Saved to {output_path}")
 
         # Show with matplotlib (correct colors)
-        plt.figure(figsize=(7, 7))
-        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-        plt.title("Detected regions")
-        plt.axis("off")
-        plt.tight_layout()
+##        plt.figure(figsize=(7, 7))
+##        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+##        plt.title("Detected regions")
+##        plt.axis("off")
+##        plt.tight_layout()
         #plt.show()
 
         ############## segmented region
@@ -807,6 +807,10 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     #else:
      #   print('predicted output: Non-Lung Cancer')
     #print('classfier_output',predicted_value[0])
+    except Exception as e:
+        print("⚠️ An error occurred in process_segmentation:")
+        traceback.print_exc()   # prints full traceback with line number
+        raise  # re-raise so the real error propagates
     #############3
     # Extract all class values
     #df = pd.DataFrame(region_rows)
@@ -939,7 +943,6 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
-
 
 
 
