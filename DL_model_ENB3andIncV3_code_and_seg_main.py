@@ -408,7 +408,11 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             data = []
             all_images = sorted(os.listdir(image_folder))
             print('ex 1_7')
+          kioa=0
             for filename in tqdm(all_images, desc=f"Extracting from {os.path.basename(image_folder)}"):
+              kioa+=1
+              if kioa>1:
+                break
                 if not filename.lower().endswith(('.png', '.jpg', '.jpeg')): continue
 
                 img_path = os.path.join(image_folder, filename)
@@ -416,7 +420,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 main_class=10
                 print('ex 1_8')
                 try:
-                    _ = model(img_path, imgsz=512, device="cpu")
+                    _ = model(img_path, imgsz=256, device="cpu")
                     feat = features_dict.get('feat')
                     if feat is None:
                         print(f"⚠️ Feature not extracted for {filename}")
@@ -973,25 +977,3 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
