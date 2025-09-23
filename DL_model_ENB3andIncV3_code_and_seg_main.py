@@ -317,7 +317,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     plt.close('all')
     ########################## segmentation model
     output_path = "./images_YOLOV11/V11_input.png"
-    try: if 1==1:#predicted_value[0]!=1:
+    try: #if 1==1:#predicted_value[0]!=1:
         from PIL import Image
         # Load best model
         # Class mapping
@@ -943,6 +943,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
