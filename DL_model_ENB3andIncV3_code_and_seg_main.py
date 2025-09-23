@@ -351,9 +351,10 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         shutil.copy(image_path, output_path)
         print('ex 1_2')
         output_path = "./output_YOLOV11/V11_SEG_PRED.png"
-
+        print('ex 1_2_1')
         # Run inference
         results = model(image_path, conf=0.2, iou=0.5, imgsz=1024)
+        print('ex 1_2_3')
         result = results[0]
         print('ex 1_3')
         # Read original image
@@ -969,8 +970,6 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
-
-
 
 
 
