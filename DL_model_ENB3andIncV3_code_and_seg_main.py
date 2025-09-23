@@ -357,6 +357,9 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 
         # Read original image
         img=img_p = cv2.imread(image_path)
+        #img = cv2.imread(image_path)
+        if img is None:
+            raise FileNotFoundError(f"Image not found: {image_path}")
         #print('*0')
         # Run inference
         if result.masks is None:   # ✅ check before using
@@ -370,7 +373,8 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             result = results[0]
             #print('*22')
             if result.masks is None:
-                print('*2###############################################')
+                print("⚠️ No segmentation detected even after multiple inference attempts.")
+                #print('*2###############################################')
         #print(sfdsfsgag)
         ###### feature extraction
         import torch
@@ -387,7 +391,11 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             features_dict['feat'] = pooled.detach().cpu().numpy()
 
         # You might need to adjust this index based on your model structure
-        hook = model.model.model[10].register_forward_hook(hook_fn)
+        #hook = model.model.model[10].register_forward_hook(hook_fn)
+        try:
+            hook = model.model.model[10].register_forward_hook(hook_fn)
+        except Exception as e:
+            print(f"❌ Failed to register hook: {e}")
         def extract_features_from_txt(image_folder, save_csv_path):
             data = []
             all_images = sorted(os.listdir(image_folder))
@@ -402,6 +410,9 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 try:
                     _ = model(img_path)
                     feat = features_dict.get('feat')
+                    if feat is None:
+                        print(f"⚠️ Feature not extracted for {filename}")
+                        continue
                     if feat is not None:
                         row = [filename, main_class] + feat.tolist()
                         data.append(row)
