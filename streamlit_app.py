@@ -1254,11 +1254,15 @@ with col2:
         TARGET_SIZE = 1024
 
         # Convert NumPy array to PIL Image
-        if len(img.shape) == 2:
-            # Grayscale to RGB
+        if len(img.shape) == 2:  # grayscale
             img_pil = Image.fromarray(img).convert("RGB")
-        else:
+        elif img.shape[2] == 3:
             img_pil = Image.fromarray(img)
+        elif img.shape[2] == 4:  # RGBA
+            img_pil = Image.fromarray(img[:, :, :3])
+        else:
+            raise ValueError(f"Unexpected image shape: {img.shape}")
+
 
         # Resize
         img_resized = img_pil.resize((TARGET_SIZE, TARGET_SIZE), Image.LANCZOS)
