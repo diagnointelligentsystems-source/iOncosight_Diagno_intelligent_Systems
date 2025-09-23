@@ -14,6 +14,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     from tensorflow import keras
     import shutil
     import matplotlib.pyplot as plt
+    import gc
     warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
     #new_dir = "E:/project_new/Project_MCN_code"  # replace with your desired folder
     #os.chdir(new_dir)
@@ -974,10 +975,13 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     if imp_result=='Lung Cancer':
       shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
     plt.close('all')
+    del results
+    gc.collect()
     print('ex 9')
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
