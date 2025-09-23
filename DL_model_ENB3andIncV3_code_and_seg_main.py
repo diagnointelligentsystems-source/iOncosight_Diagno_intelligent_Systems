@@ -315,6 +315,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         predicted_value[0]=0
     print('predicted_value[0]',predicted_value[0])
     plt.close('all')
+    print('ex 1')
     ########################## segmentation model
     output_path = "./images_YOLOV11/V11_input.png"
     try: #if 1==1:#predicted_value[0]!=1:
@@ -419,6 +420,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             image_folder='./images_YOLOV11',
             save_csv_path='./yolov11_MCN_whole_features_test.csv'
         )
+        print('ex 2')
         ######### ML results
         import ens_modelling_MCN_test_fn
 
@@ -430,7 +432,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 
         #print('conf_ML',conf_ML)
         cv2.imwrite(output_path, img_p)
-
+        print('ex 3')
         ################3 changing label confidence score
         # -------- Step 1: Apply segmentation masks (without darkening background) --------
         if result.masks is not None and ens_ML_MCN_output<2:   # ✅ check before using (include both Mass and COPD)
@@ -514,6 +516,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         #plt.show()
 
         ############## segmented region
+        print('ex 4')
         if 1==1:#ens_ML_MCN_output==0: #
             # ----------------------------
             # CLASS NAMES
@@ -579,7 +582,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                     minor_len=float(min_len), minor_p1=q1, minor_p2=q2, minor_angle_deg=min_angle_deg
                 )
 
-
+            print('ex 5')
             # ==================== main ====================
 
             def process_segmentation(image_path, results,predicted_value):
@@ -804,6 +807,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 return copd_p
 
             copd_p=process_segmentation(image_path, results,predicted_value)
+            print('ex 6')
     #else:
      #   print('predicted output: Non-Lung Cancer')
     #print('classfier_output',predicted_value[0])
@@ -873,7 +877,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 max_confidence_ML = predicted_proba_DL
                 shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
                 imp_image_out = "./result.jpg"
-
+        print('ex 7')
         if imp_result != 'Non-Lung Cancer':
             imp_image_out2 = "./output_YOLOV11/Grad_cam_PRED.png"
             imp_image_out1 = "./output_YOLOV11/V11_SEG_PRED.png"
@@ -937,13 +941,14 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 imp_result = 'Non-Lung Cancer'
                 max_confidence_ML = predicted_proba_DL
                 imp_image_out="./result.jpg"#"./output_YOLOV11/Grad_cam_PRED.png"
+    print('ex 8')
     if imp_result=='Lung Cancer':
       shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
     plt.close('all')
+    print('ex 9')
     ################3
 
     return imp_result,max_confidence_ML
-
 
 
 
