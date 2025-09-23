@@ -355,7 +355,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         # Run inference
         results = model(image_path, conf=0.2, iou=0.5, imgsz=1024)
         result = results[0]
-        print('ex 1_13)
+        print('ex 1_3')
         # Read original image
         img=img_p = cv2.imread(image_path)
         #img = cv2.imread(image_path)
@@ -969,6 +969,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
