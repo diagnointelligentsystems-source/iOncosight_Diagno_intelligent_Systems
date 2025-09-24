@@ -325,10 +325,10 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     plt.close('all')
     print('ex 1')
     #### delecting un used data
-    loaded_SVM_model=[]
-    eff_model=inc_model=[]
-    loaded_model=[]
-    rf_chi2_ens=st_ens_LC_NR=rf_mi_ens=xgb_chi2_ens=[]
+    del loaded_SVM_model
+    del eff_model,inc_model
+    del loaded_model
+    del rf_chi2_ens,st_ens_LC_NR,rf_mi_ens,xgb_chi2_ens
     ########################## segmentation model
     output_path = "./images_YOLOV11/V11_input.png"
     try: #if 1==1:#predicted_value[0]!=1:
@@ -394,16 +394,23 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             raise FileNotFoundError(f"Image not found: {image_path}")
         #print('*0')
         # Run inference
+        log_memory_usage("start")  # ~50 MB
+
+        big_list = [i for i in range(10**7)]
+        log_memory_usage("after big_list")  # jumps to ~300 MB (real)
+        
+        del big_list
+        log_memory_usage("after deleting big_list") 
         print('ex 1_4')
         if result.masks is None:   # ✅ check before using
             print('*1')
-            results=result=[]
+            del results,result
             results = model(image_path, conf=0.1, iou=0.5, imgsz=1024, device="cpu")
             result = results[0]
             # if result.masks is not None:
             #     print('*11')
         if result.masks is None:   # ✅ check before using
-            results=result=[]
+            del results,result
             results = model(image_path, conf=0.05, iou=0.5, imgsz=256, device="cpu")
             result = results[0]
             print('*22')
@@ -961,6 +968,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
