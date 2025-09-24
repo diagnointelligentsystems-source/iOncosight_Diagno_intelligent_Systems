@@ -14,8 +14,7 @@ from huggingface_hub import hf_hub_download, whoami
 import joblib
 from ultralytics import YOLO
 import gc
-# ----------------------------
-# Set Hugging Face token safely 
+
 # ----------------------------
 # Set Hugging Face token safely
 # ----------------------------
@@ -23,137 +22,111 @@ hf_token = st.secrets["HF_TOKEN"]
 os.environ["HUGGINGFACE_HUB_TOKEN"] = hf_token
 
 # ----------------------------
-# Deep Learning Models
+# Memory logging helper
 # ----------------------------
-@st.cache_resource
+def log_memory_usage(note=""):
+    process = psutil.Process(os.getpid())
+    mem = process.memory_info().rss / (1024 * 1024)  # MB
+    st.write(f"🧠 Memory at {note}: {mem:.2f} MB")
+
+log_memory_usage("start (before loading models)")
+
+# ----------------------------
+# Enable mixed precision for TensorFlow
+# ----------------------------
+from tensorflow.keras import mixed_precision
+mixed_precision.set_global_policy('mixed_float16')
+
+# ----------------------------
+# Lazy loading of models
+# ----------------------------
+@st.cache_resource(show_spinner=False)
 def load_yolo():
     model_path = hf_hub_download(
         repo_id="DiagnoIntelligentSytem/lung-xray-models",
         filename="yolov11_seg_MCN_best.pt"
     )
-    return YOLO(model_path) #if you need to use YOLO class
+    model = YOLO(model_path)
+    model.model.half()  # Convert to half precision
+    return model
 
-
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def load_eff_model():
     model_path = hf_hub_download(
         repo_id="DiagnoIntelligentSytem/lung-xray-models",
         filename="model_LCm_others_B3_20d_8b_m300_ly1024_ly512.keras"
     )
-    return keras.models.load_model(model_path, compile=False)
+    model = keras.models.load_model(model_path, compile=False)
+    return model
 
-
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def load_inc_model():
     model_path = hf_hub_download(
         repo_id="DiagnoIntelligentSytem/lung-xray-models",
         filename="model_LCm_others_V3_20d_64b_m299_ly1024_ly512.keras"
     )
-    return keras.models.load_model(model_path, compile=False)
+    model = keras.models.load_model(model_path, compile=False)
+    return model
 
-
-# ----------------------------
-# Machine Learning Models
-# ----------------------------
-@st.cache_resource
-def load_rf_chi2():
+@st.cache_resource(show_spinner=False)
+def load_joblib_model(filename):
     model_path = hf_hub_download(
-        repo_id="DiagnoIntelligentSytem/lung-xray-models",
-        filename="lbm_BOTH_rf_model_chi2_w_fec_200_train_acc1.0_test_acc0.914235294117647.pkl"
-    )
-    return joblib.load(model_path)
-
-
-@st.cache_resource
-def load_xgb_chi2():
-    model_path = hf_hub_download(
-        repo_id="DiagnoIntelligentSytem/lung-xray-models",
-        filename="2_LC_mass_other_xgb_chi2_fec_150_acc1.0.pkl"
-    )
-    return joblib.load(model_path)
-
-
-@st.cache_resource
-def load_rf_mi():
-    model_path = hf_hub_download(
-        repo_id="DiagnoIntelligentSytem/lung-xray-models",
-        filename="lbm_BOTH_rf_model_mutual_info_classif_w_fec_150_train_acc1.0_test_acc0.914235294117647.pkl"
-    )
-    return joblib.load(model_path)
-
-
-@st.cache_resource
-def load_stacked_LC_NR():
-    model_path = hf_hub_download(
-        repo_id="DiagnoIntelligentSytem/lung-xray-models",
-        filename="stacked_ensemble_model_ML_LCmass_others.pkl"
-    )
-    return joblib.load(model_path)
-
-
-@st.cache_resource
-def load_sel_ens_M1():
-    model_path = hf_hub_download(
-        repo_id="DiagnoIntelligentSytem/lung-xray-models",
-        filename="1_MCN_rf_model_f_classif_fec_51_train_acc1.0_test_acc1.0.pkl"
-    )
-    return joblib.load(model_path)
-
-
-@st.cache_resource
-def load_sel_ens_M2():
-    model_path = hf_hub_download(
-        repo_id="DiagnoIntelligentSytem/lung-xray-models",
-        filename="2_MCN_rf_model_mutual_info_classif_fec_51_train_acc1.0_test_acc1.0.pkl"
-    )
-    return joblib.load(model_path)
-
-
-@st.cache_resource
-def load_sel_ens_M3():
-    model_path = hf_hub_download(
-        repo_id="DiagnoIntelligentSytem/lung-xray-models",
-        filename="3_MCN_xgb_mutual_info_classif_fec_51_train_acc1.0_test_acc1.0.pkl"
-    )
-    return joblib.load(model_path)
-
-
-@st.cache_resource
-def load_ens_MCN():
-    model_path = hf_hub_download(
-        repo_id="DiagnoIntelligentSytem/lung-xray-models",
-        filename="stacked_ensemble_model_ML_MCN.pkl"
-    )
-    return joblib.load(model_path)
-
-
-# ----------------------------
-# Scalers (use cache_data since they are small)
-# ----------------------------
-@st.cache_data
-def load_scaler(filename: str):
-    return hf_hub_download(
         repo_id="DiagnoIntelligentSytem/lung-xray-models",
         filename=filename
     )
-
+    return joblib.load(model_path)
 
 # ----------------------------
-# Initialize all models once
+# Lazy model loading buttons
 # ----------------------------
-yolov11 = load_yolo()
-eff_model = load_eff_model()
-inc_model = load_inc_model()
+st.header("Load Models On Demand")
 
-rf_chi2_ens = load_rf_chi2()
-xgb_chi2_ens = load_xgb_chi2()
-rf_mi_ens = load_rf_mi()
-st_ens_LC_NR = load_stacked_LC_NR()
+if st.button("Load YOLO"):
+    yolov11 = load_yolo()
+    log_memory_usage("after loading YOLO")
 
-sel_ens_M1 = load_sel_ens_M1()
-sel_ens_M2 = load_sel_ens_M2()
-sel_ens_M3 = load_sel_ens_M3()
-ens_MCN = load_ens_MCN()
+if st.button("Load EfficientNet B3"):
+    eff_model = load_eff_model()
+    log_memory_usage("after loading EffNet B3")
+
+if st.button("Load Inception V3"):
+    inc_model = load_inc_model()
+    log_memory_usage("after loading Inception V3")
+
+if st.button("Load RF Chi2 Ensemble"):
+    rf_chi2_ens = load_joblib_model("lbm_BOTH_rf_model_chi2_w_fec_200_train_acc1.0_test_acc0.914235294117647.pkl")
+    log_memory_usage("after loading RF Chi2")
+
+if st.button("Load XGB Chi2 Ensemble"):
+    xgb_chi2_ens = load_joblib_model("2_LC_mass_other_xgb_chi2_fec_150_acc1.0.pkl")
+    log_memory_usage("after loading XGB Chi2")
+
+# ----------------------------
+# Clear memory buttons
+# ----------------------------
+st.header("Clear Models From Memory")
+if st.button("Clear TensorFlow Models"):
+    if 'eff_model' in globals():
+        del eff_model
+    if 'inc_model' in globals():
+        del inc_model
+    tf.keras.backend.clear_session()
+    gc.collect()
+    log_memory_usage("after clearing TF models")
+
+if st.button("Clear PyTorch YOLO Model"):
+    if 'yolov11' in globals():
+        del yolov11
+    gc.collect()
+    log_memory_usage("after clearing YOLO")
+
+if st.button("Clear All Joblib Models"):
+    for var in list(globals()):
+        if var.endswith("_ens"):
+            del globals()[var]
+    gc.collect()
+    log_memory_usage("after clearing all joblib models")
+
 
 ens_scaler_rf_chi2 = load_scaler("scaler_ALL_FEATURE_LC_mass_other_rf_chi2_BOTH__min_max_w_fec.pkl")
 ens_scaler_xgb_chi2 = load_scaler("scaler_ALL_FEATURE_2_LC_mass_other_xgb_chi2__min_max_K_{k}.pkl")
