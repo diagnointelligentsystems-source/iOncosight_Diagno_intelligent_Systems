@@ -431,47 +431,47 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             return results[0]
         
         # -------------------- Main inference wrapper --------------------
-      import torch
-      import cv2
-      
-      torch.set_num_threads(2)
-      
-      img = cv2.imread(image_path)
-      if img is None:
-          raise ValueError("Image not found")
-      
-      # Convert grayscale to RGB if needed
-      if len(img.shape) != 3 or img.shape[2] != 3:
-          img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-      img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-      
-      # Run inference
-      results = model.predict(img_rgb, conf=0.2, iou=0.5, imgsz=512, device="cpu")
-      print("Raw results:", results)
-      
-      if results and len(results) > 0:
-          result = results[0]
-          boxes = getattr(result, "boxes", None)
-          masks = getattr(result, "masks", None)
-      
-          # Check boxes
-          if boxes is not None and len(boxes.xyxy) > 0:
-              print("✅ Detections found")
-              print("Boxes (x1, y1, x2, y2, conf, class_id):")
-              print(boxes.xyxy)
-              class_ids = boxes.cls
-              print("Predicted classes:", [result.names[int(c)] for c in class_ids])
-          else:
-              print("⚠️ No boxes found")
-          
-          # Check masks
-          if masks is not None:
-              print("Masks available")
-          else:
-              print("No masks (detection-only model)")
-      else:
-          print("⚠️ No detections returned")
-          result = None
+        import torch
+        import cv2
+
+        torch.set_num_threads(2)
+
+        img = cv2.imread(image_path)
+        if img is None:
+            raise ValueError("Image not found")
+
+        # Convert grayscale to RGB if needed
+        if len(img.shape) != 3 or img.shape[2] != 3:
+            img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        # Run inference
+        results = model.predict(img_rgb, conf=0.2, iou=0.5, imgsz=512, device="cpu")
+        print("Raw results:", results)
+
+        if results and len(results) > 0:
+            result = results[0]
+            boxes = getattr(result, "boxes", None)
+            masks = getattr(result, "masks", None)
+
+            # Check boxes
+            if boxes is not None and len(boxes.xyxy) > 0:
+                print("✅ Detections found")
+                print("Boxes (x1, y1, x2, y2, conf, class_id):")
+                print(boxes.xyxy)
+                class_ids = boxes.cls
+                print("Predicted classes:", [result.names[int(c)] for c in class_ids])
+            else:
+                print("⚠️ No boxes found")
+
+            # Check masks
+            if masks is not None:
+                print("Masks available")
+            else:
+                print("No masks (detection-only model)")
+        else:
+            print("⚠️ No detections returned")
+            result = None
         
 ### Read original image
         img_p = cv2.imread(image_path)
@@ -1068,17 +1068,3 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
-
-
-
-
-
-
-
-
-
-
-
-
-
-
