@@ -17,6 +17,15 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     import gc
     import traceback
     import psutil
+    def print_free_memory():
+        mem = psutil.virtual_memory()
+        st.write(f"💾 Total Memory: {mem.total / (1024**3):.2f} GB")
+        st.write(f"💾 Available Memory: {mem.available / (1024**3):.2f} GB")
+        st.write(f"💾 Used Memory: {mem.used / (1024**3):.2f} GB")
+        st.write(f"💾 Memory Usage: {mem.percent}%")
+    
+    # Example usage
+    print_free_memory()
     def log_memory_usage(note=""):
       process = psutil.Process(os.getpid())
       mem = process.memory_info().rss / (1024 * 1024)  # in MB
@@ -998,6 +1007,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
