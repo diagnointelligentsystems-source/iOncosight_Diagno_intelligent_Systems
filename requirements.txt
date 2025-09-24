@@ -14,7 +14,7 @@ imutils
 seaborn
 xgboost==1.6.2  
 numpy==1.26.4
-ultralytics
+ultralytics==8.3.193
 tqdm
 huggingface-hub>=0.16.4
 opencv-python-headless
