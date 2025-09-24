@@ -556,10 +556,13 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         ################3 changing label confidence score
         # -------- Step 1: Apply segmentation masks (without darkening background) --------
         if result.masks is not None and ens_ML_MCN_output<2 and  (masks  is not None):   # ✅ check before using (include both Mass and COPD)
-            for mask, cls_id in zip(result.masks.data, result.boxes.cls):
-                print('cls_id',cls_id)
-                cls_id = int(cls_id)
-                print('cls_id', cls_id)
+            # Convert cls_id to int safely
+            if isinstance(cls_id, (list, torch.Tensor)):
+                cls_id_scalar = int(cls_id[0])  # take first element if list/tensor
+            else:
+                cls_id_scalar = int(cls_id)
+
+            print('cls_id_scalar', cls_id_scalar)
                 # if cls_id>0:
                 #     continue
                 cls_name = class_names[cls_id]
