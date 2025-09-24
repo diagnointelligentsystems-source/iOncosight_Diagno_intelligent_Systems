@@ -536,7 +536,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         # Extract features directly from the hook
         feat = features_dict.get('feat', None)
         ens_ML_MCN_output=60
-        conf_ML=[]
+        conf_ML=predicted_proba_DL
         if feat is not None:
             print(f"✅ Feature length: {feat.shape}")
             # Save to CSV
@@ -1098,3 +1098,4 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
+
