@@ -16,6 +16,11 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     import matplotlib.pyplot as plt
     import gc
     import traceback
+    def log_memory_usage(note=""):
+      process = psutil.Process(os.getpid())
+      mem = process.memory_info().rss / (1024 * 1024)  # in MB
+      st.write(f"🧠 Memory at {note}: {mem:.2f} MB")
+               
     warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
     #new_dir = "E:/project_new/Project_MCN_code"  # replace with your desired folder
     #os.chdir(new_dir)
@@ -992,6 +997,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
