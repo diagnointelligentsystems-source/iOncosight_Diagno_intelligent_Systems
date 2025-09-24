@@ -416,7 +416,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 print(f"❌ Failed to register hook: {e}")
         
         # -------------------- Inference function --------------------
-        def run_inference(img, model, conf=0.2, iou=0.5, imgsz=512, device="cpu"):
+        def run_inference(img, model, conf=0.05, iou=0.5, imgsz=512, device="cpu"):
             """
             Run YOLOv11 segmentation inference on a single image.
             Returns YOLO results object or None if failed.
@@ -1081,6 +1081,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
+
 
 
 
