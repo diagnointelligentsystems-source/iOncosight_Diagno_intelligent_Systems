@@ -447,7 +447,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         print("Result ready:", result)
 
 ### Read original image
-##        img=img_p = cv2.imread(image_path)
+        img_p = cv2.imread(image_path)
 ##        #img = cv2.imread(image_path)
 ##        if img is None:
 ##            raise FileNotFoundError(f"Image not found: {image_path}")
@@ -1041,5 +1041,6 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
+
 
 
