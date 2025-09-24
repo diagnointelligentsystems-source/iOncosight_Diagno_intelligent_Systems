@@ -431,59 +431,22 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             return results[0]
         
         # -------------------- Main inference wrapper --------------------
-        def full_inference(image_path, model):
-            print("📌 Image path:", image_path)
-            print_free_memory()
-            log_memory("before loading model")
+        img = cv2.imread(image_path)
+        if img is None:
+            raise ValueError("Image not found")
+        if len(img.shape) != 3 or img.shape[2] != 3:
+            img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         
-            # Register feature hook
-            register_feature_hook(model, layer_idx=10)
-            log_memory("after loading model")
+        results = model.predict(img_rgb, conf=0.01, iou=0.5, imgsz=512, device="cpu")
+        print("Raw results:", results)
         
-            # Load image
-            img = cv2.imread(image_path)
-            if img is None:
-                print(f"❌ Image not found or cannot be read: {image_path}")
-                return None, None
-        
-            try:
-                # Run inference in a separate thread
-                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-                    future = executor.submit(run_inference, img, model)
-                    result = future.result()
-                
-                log_memory("after inference")
-        
-                if result is None:
-                    print("⚠️ No detections returned")
-                    return None, None
-        
-                # Access masks, boxes safely
-                masks = getattr(result, "masks", None)
-                boxes = getattr(result, "boxes", None)
-                print("✅ Inference finished")
-                print(f"Masks: {masks}, Boxes: {boxes}")
-        
-                # Features extracted by hook (optional)
-                features = features_dict.get("feat", None)
-                if features is not None:
-                    print(f"✅ Features extracted, length: {features.shape}")
-        
-                return result, features
-        
-            except Exception as e:
-                print("❌ Inference failed:")
-                traceback.print_exc()
-                return None, None
-        
-        # -------------------- Example usage --------------------
-        image_path = "./images/input.png"
-        result, features = full_inference(image_path, model)
-        
-        if result:
-            print("Predictions ready")
+        if results and len(results) > 0:
+            r = results[0]
+            print("Boxes:", getattr(r, "boxes", None))
+            print("Masks:", getattr(r, "masks", None))
         else:
-            print("No predictions returned")
+            print("⚠️ No detections returned")
 
         
 ### Read original image
@@ -1081,6 +1044,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
+
 
 
 
