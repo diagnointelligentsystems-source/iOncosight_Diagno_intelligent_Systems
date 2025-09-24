@@ -395,6 +395,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         print("img_samp shape:", img_samp.shape)
       # Run inference
         import torch
+        torch.set_num_threads(4)
         from tqdm import tqdm
         # Run inference
         print_free_memory() 
@@ -439,6 +440,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             print('*1')
             del results,result
             try:
+                print('image_path',image_path)
                 results = model(image_path, conf=0.1, iou=0.5, imgsz=1024, device="cpu")
                 result = results[0]
                 log_memory("after inference")
@@ -450,8 +452,9 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             #     print('*11')
         if result.masks is None:   # ✅ check before using
             del results,result
-            try:
-                results = model(image_path, conf=0.1, iou=0.5, imgsz=1024, device="cpu")
+            try:              
+                print('image_path',image_path)
+                results = model(image_path, conf=0.05, iou=0.5, imgsz=1024, device="cpu")
                 result = results[0]
                 log_memory("after inference")
             except Exception as e:
@@ -1013,6 +1016,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
