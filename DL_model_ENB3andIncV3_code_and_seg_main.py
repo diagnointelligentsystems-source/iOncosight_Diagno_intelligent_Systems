@@ -414,7 +414,10 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         log_memory("after loading model")
         
         try:
-            results = model(image_path, conf=0.2, iou=0.5, imgsz=1024, device="cpu")
+          img = cv2.imread(image_path)
+          img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+          results = model.predict(img, conf=0.2, iou=0.5, imgsz=1024, device="cpu")  
+          #results = model(image_path, conf=0.2, iou=0.5, imgsz=1024, device="cpu")
             log_memory("after inference")
         except Exception as e:
             import traceback
@@ -441,7 +444,10 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             del results,result
             try:
                 print('image_path',image_path)
-                results = model(image_path, conf=0.1, iou=0.5, imgsz=1024, device="cpu")
+                img = cv2.imread(image_path)
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                results = model.predict(img, conf=0.1, iou=0.5, imgsz=1024, device="cpu") 
+                #results = model.predict(img, conf=0.1, iou=0.5, imgsz=640, device="cpu") #model(image_path, conf=0.1, iou=0.5, imgsz=1024, device="cpu")
                 result = results[0]
                 log_memory("after inference")
             except Exception as e:
@@ -454,7 +460,10 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             del results,result
             try:              
                 print('image_path',image_path)
-                results = model(image_path, conf=0.05, iou=0.5, imgsz=1024, device="cpu")
+                img = cv2.imread(image_path)
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                results = model.predict(img, conf=0.05, iou=0.5, imgsz=624, device="cpu")   
+              #results = model(image_path, conf=0.05, iou=0.5, imgsz=1024, device="cpu")
                 result = results[0]
                 log_memory("after inference")
             except Exception as e:
@@ -1016,6 +1025,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
