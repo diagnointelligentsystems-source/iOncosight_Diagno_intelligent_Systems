@@ -433,7 +433,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         # -------------------- Main inference wrapper --------------------
         import torch
         import cv2
-
+        masks=None
         torch.set_num_threads(2)
 
         img = cv2.imread(image_path)
@@ -522,34 +522,39 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         ###### feature extraction
         print('ex 1_5')
         # Extract features directly from the hook
-        feat = features_dict.get('feat')
+        feat = features_dict.get("feat", None)
+        ens_ML_MCN_output=[]
+        conf_ML=[]
         if feat is not None:
             print(f"✅ Feature length: {feat.shape}")
             # Save to CSV
             row = [os.path.basename(image_path), 10] + feat.tolist()
             df = pd.DataFrame([row], columns=['filename', 'label'] + [f'feat_{i}' for i in range(len(feat))])
             df.to_csv('./yolov11_MCN_whole_features_test.csv', index=False)
+            import ens_modelling_MCN_test_fn
+
+            ens_ML_MCN_output, predicted_proba1 = ens_modelling_MCN_test_fn.ens_ML_MCN(sel_ens_M1, sel_ens_M2,
+                                                                                      sel_ens_M3, scaled_ens_M1,
+                                                                                      scaled_ens_M2, scaled_ens_M3,
+                                                                                      ens_MCN)
+            # print("Ens ML results:", ens_ML_MCN_output)
+            predicted_proba1 = predicted_proba1[0]
+            conf_ML = predicted_proba1[ens_ML_MCN_output] * 100
+
+            # print('conf_ML',conf_ML)
+            cv2.imwrite(output_path, img_p)
+            # delect
+            del sel_ens_M1, sel_ens_M2, sel_ens_M3, scaled_ens_M1, scaled_ens_M2, scaled_ens_M3, ens_MCN
+            print('ex 3')
         else:
             print("⚠️ Feature was not extracted.")
         model = yolov11=[]
         print('ex 2')
         ######### ML results
-        import ens_modelling_MCN_test_fn
 
-        ens_ML_MCN_output,predicted_proba = ens_modelling_MCN_test_fn.ens_ML_MCN(sel_ens_M1,sel_ens_M2,sel_ens_M3,scaled_ens_M1,scaled_ens_M2,scaled_ens_M3,ens_MCN)
-        #print("Ens ML results:", ens_ML_MCN_output)
-        predicted_proba=predicted_proba[0]
-        conf_ML=predicted_proba[ens_ML_MCN_output]*100
-
-
-        #print('conf_ML',conf_ML)
-        cv2.imwrite(output_path, img_p)
-        # delect
-        del sel_ens_M1,sel_ens_M2,sel_ens_M3,scaled_ens_M1,scaled_ens_M2,scaled_ens_M3,ens_MCN
-        print('ex 3')
         ################3 changing label confidence score
         # -------- Step 1: Apply segmentation masks (without darkening background) --------
-        if result.masks is not None and ens_ML_MCN_output<2:   # ✅ check before using (include both Mass and COPD)
+        if result.masks is not None and ens_ML_MCN_output<2 and  (masks is None):   # ✅ check before using (include both Mass and COPD)
             for mask, cls_id in zip(result.masks.data, result.boxes.cls):
                 cls_id = int(cls_id)
                 # if cls_id>0:
