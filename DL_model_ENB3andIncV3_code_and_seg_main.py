@@ -324,8 +324,11 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('predicted_value[0]',predicted_value[0])
     plt.close('all')
     print('ex 1')
-    ####
+    #### delecting un used data
+    loaded_SVM_model=[]
     eff_model=inc_model=[]
+    loaded_model=[]
+    rf_chi2_ens=st_ens_LC_NR=rf_mi_ens=xgb_chi2_ens=[]
     ########################## segmentation model
     output_path = "./images_YOLOV11/V11_input.png"
     try: #if 1==1:#predicted_value[0]!=1:
@@ -956,6 +959,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
