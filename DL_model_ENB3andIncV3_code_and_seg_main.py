@@ -395,7 +395,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         print("img_samp shape:", img_samp.shape)
       # Run inference
         import torch
-        torch.set_num_threads(4)
+        torch.set_num_threads(2)
         from tqdm import tqdm
         # Run inference
         print_free_memory() 
@@ -416,7 +416,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         try:
           img = cv2.imread(image_path)
           img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-          results = model.predict(img, conf=0.2, iou=0.5, imgsz=1024, device="cpu")  
+          results = model.predict(img, conf=0.2, iou=0.5, imgsz=640, device="cpu")  
           #results = model(image_path, conf=0.2, iou=0.5, imgsz=1024, device="cpu")
           log_memory("after inference")
         except Exception as e:
@@ -446,7 +446,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 print('image_path',image_path)
                 img = cv2.imread(image_path)
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                results = model.predict(img, conf=0.1, iou=0.5, imgsz=1024, device="cpu") 
+                results = model.predict(img, conf=0.1, iou=0.5, imgsz=640, device="cpu") 
                 #results = model.predict(img, conf=0.1, iou=0.5, imgsz=640, device="cpu") #model(image_path, conf=0.1, iou=0.5, imgsz=1024, device="cpu")
                 result = results[0]
                 log_memory("after inference")
@@ -462,7 +462,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 print('image_path',image_path)
                 img = cv2.imread(image_path)
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                results = model.predict(img, conf=0.05, iou=0.5, imgsz=624, device="cpu")   
+                results = model.predict(img, conf=0.05, iou=0.5, imgsz=640, device="cpu")   
               #results = model(image_path, conf=0.05, iou=0.5, imgsz=1024, device="cpu")
                 result = results[0]
                 log_memory("after inference")
@@ -1025,6 +1025,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
