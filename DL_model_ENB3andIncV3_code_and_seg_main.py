@@ -446,7 +446,8 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         # Run inference
-        results = model.predict(img_rgb, conf=0.2, iou=0.5, imgsz=512, device="cpu")
+        results = model(image_path, conf=0.2, iou=0.5, imgsz=512, device="cpu")
+        #results = model.predict(img_rgb, conf=0.2, iou=0.5, imgsz=512, device="cpu")
         print("Raw results:", results)
 
         if results and len(results) > 0:
