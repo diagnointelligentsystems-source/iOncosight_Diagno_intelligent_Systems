@@ -398,51 +398,54 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         print("img_samp shape:", img_samp.shape)
       # Run inference
         import torch
+        import cv2
+        import concurrent.futures
+        
         torch.set_num_threads(2)
-        from tqdm import tqdm
-        # Run inference
-        print_free_memory() 
-        features_dict = {}
+        
+        # Before loading model
+        print_free_memory()
         log_memory("before loading model")
+        
+        features_dict = {}
         def hook_fn(module, input, output):
             pooled = torch.mean(output[0], dim=(1, 2))  # Global Average Pooling
             features_dict['feat'] = pooled.detach().cpu().numpy()
-
+        
         try:
             hook = model.model.model[10].register_forward_hook(hook_fn)
         except Exception as e:
             print(f"❌ Failed to register hook: {e}")
         print('hook passed')
-              # load model
+        
         log_memory("after loading model")
         
+        # ---------- Inference ----------
+        def run_inference(img):
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            results = model.predict(img, conf=0.2, iou=0.5, imgsz=512, device="cpu")
+            return results
+        
         try:
-          img =img_p = cv2.imread(image_path)
-          img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-          import concurrent.futures
-          def run_inference(image_path):
-              img = cv2.imread(image_path)
-              img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-              results = model.predict(img, conf=0.2, iou=0.5, imgsz=512, device="cpu")
-              return results
-          
-          # Run in background thread
-          with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-              future = executor.submit(run_inference, image_path)
-          
-              # Wait for result (blocking, but outside Streamlit’s main loop)
-              results = future.result()
-          
-          # After using results
-          print(" Inference finished")
+            img = cv2.imread(image_path)
+        
+            # Run inference in separate process
+            with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(run_inference, img)
+                results = future.result()
+        
+            print("✅ Inference finished")
         except Exception as e:
-          #import traceback
-          print(" Inference failed:")
-          traceback.print_exc()
-        # inference
-        log_memory("after inference") 
-        print('ex 1_2_3')
+            import traceback
+            print("❌ Inference failed:")
+            traceback.print_exc()
+        
+        log_memory("after inference")
+        
+        # Access first result
         result = results[0]
+        print("Result ready:", result)
+
 ### Read original image
 ##        img=img_p = cv2.imread(image_path)
 ##        #img = cv2.imread(image_path)
@@ -1038,4 +1041,5 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
+
 
