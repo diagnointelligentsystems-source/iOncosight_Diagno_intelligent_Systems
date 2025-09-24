@@ -429,9 +429,10 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         log_memory("after loading model")
         
         try:
-            # Run inference in a separate process
-            with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
-                future = executor.submit(run_inference, image_path)
+            img = cv2.imread(image_path)
+        
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(run_inference, img)
                 results = future.result()
         
             if results and len(results) > 0:
@@ -439,10 +440,13 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 print("✅ Inference finished, result ready:", result)
             else:
                 print("⚠️ No results returned")
+                result = None
+        
         except Exception as e:
             import traceback
             print("❌ Inference failed:")
             traceback.print_exc()
+            result = None
         
         log_memory("after inference")
 
@@ -1042,6 +1046,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
+
 
 
 
