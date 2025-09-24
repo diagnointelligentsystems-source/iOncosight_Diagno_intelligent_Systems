@@ -408,15 +408,15 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         def register_feature_hook(model, layer_idx=10):
             try:
                 def hook_fn(module, input, output):
-                    pooled = torch.mean(output[0], dim=(1, 2))  # Global Average Pooling
+                    pooled = torch.mean(output[0], dim=(1, 2))
                     features_dict['feat'] = pooled.detach().cpu().numpy()
-                hook = model.model.model[layer_idx].register_forward_hook(hook_fn)
+                model.model.model[layer_idx].register_forward_hook(hook_fn)
                 print("✅ Feature hook registered")
             except Exception as e:
                 print(f"❌ Failed to register hook: {e}")
         
         # -------------------- Inference function --------------------
-        def run_inference(img, conf=0.2, iou=0.5, imgsz=512, device="cpu"):
+        def run_inference(img, model, conf=0.2, iou=0.5, imgsz=512, device="cpu"):
             """
             Run YOLOv11 segmentation inference on a single image.
             Returns YOLO results object or None if failed.
@@ -424,24 +424,19 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             if img is None:
                 raise ValueError("Input image is None")
             
-            # Convert BGR to RGB
             img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            
-            # Run model prediction
             results = model.predict(img_rgb, conf=conf, iou=iou, imgsz=imgsz, device=device)
-            
             if not results or len(results) == 0:
                 return None
-            
             return results[0]
         
         # -------------------- Main inference wrapper --------------------
-        def full_inference(image_path):
+        def full_inference(image_path, model):
             print("📌 Image path:", image_path)
             print_free_memory()
             log_memory("before loading model")
         
-            # Register feature hook (optional)
+            # Register feature hook
             register_feature_hook(model, layer_idx=10)
             log_memory("after loading model")
         
@@ -454,7 +449,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             try:
                 # Run inference in a separate thread
                 with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-                    future = executor.submit(run_inference, img)
+                    future = executor.submit(run_inference, img, model)
                     result = future.result()
                 
                 log_memory("after inference")
@@ -483,7 +478,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         
         # -------------------- Example usage --------------------
         image_path = "./images/input.png"
-        result, features = full_inference(image_path)
+        result, features = full_inference(image_path, model)
         
         if result:
             print("Predictions ready")
@@ -1086,6 +1081,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
+
 
 
 
