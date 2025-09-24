@@ -397,69 +397,98 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         print('image_path :',image_path)
         print("img_samp shape:", img_samp.shape)
       # Run inference
-        import torch
-        import cv2
-        import concurrent.futures
+        def log_memory(stage=""):
+            import psutil
+            process = psutil.Process(os.getpid())
+            rss = process.memory_info().rss / (1024 ** 2)
+            print(f"[{stage}] RSS memory: {rss:.2f} MB")
         
-        torch.set_num_threads(2)
-        
-        # Hook function
+        # -------------------- Feature extraction hook --------------------
         features_dict = {}
-        def hook_fn(module, input, output):
-            pooled = torch.mean(output[0], dim=(1, 2))  # Global Average Pooling
-            features_dict['feat'] = pooled.detach().cpu().numpy()
+        def register_feature_hook(model, layer_idx=10):
+            try:
+                def hook_fn(module, input, output):
+                    pooled = torch.mean(output[0], dim=(1, 2))  # Global Average Pooling
+                    features_dict['feat'] = pooled.detach().cpu().numpy()
+                hook = model.model.model[layer_idx].register_forward_hook(hook_fn)
+                print("✅ Feature hook registered")
+            except Exception as e:
+                print(f"❌ Failed to register hook: {e}")
         
-        # -------- Inference function (GLOBAL scope, not nested) --------
-        def run_inference(image_path):
+        # -------------------- Inference function --------------------
+        def run_inference(img, conf=0.2, iou=0.5, imgsz=512, device="cpu"):
+            """
+            Run YOLOv11 segmentation inference on a single image.
+            Returns YOLO results object or None if failed.
+            """
+            if img is None:
+                raise ValueError("Input image is None")
+            
+            # Convert BGR to RGB
+            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            
+            # Run model prediction
+            results = model.predict(img_rgb, conf=conf, iou=iou, imgsz=imgsz, device=device)
+            
+            if not results or len(results) == 0:
+                return None
+            
+            return results[0]
+        
+        # -------------------- Main inference wrapper --------------------
+        def full_inference(image_path):
+            print("📌 Image path:", image_path)
+            print_free_memory()
+            log_memory("before loading model")
+        
+            # Register feature hook (optional)
+            register_feature_hook(model, layer_idx=10)
+            log_memory("after loading model")
+        
+            # Load image
             img = cv2.imread(image_path)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            results = model.predict(img, conf=0.2, iou=0.5, imgsz=512, device="cpu")
-            return results
+            if img is None:
+                print(f"❌ Image not found or cannot be read: {image_path}")
+                return None, None
         
-        # -------- Main code --------
-        print_free_memory()
-        log_memory("before loading model")
+            try:
+                # Run inference in a separate thread
+                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                    future = executor.submit(run_inference, img)
+                    result = future.result()
+                
+                log_memory("after inference")
         
-        try:
-            hook = model.model.model[10].register_forward_hook(hook_fn)
-        except Exception as e:
-            print(f"❌ Failed to register hook: {e}")
-        print("hook passed")
+                if result is None:
+                    print("⚠️ No detections returned")
+                    return None, None
         
-        log_memory("after loading model")
+                # Access masks, boxes safely
+                masks = getattr(result, "masks", None)
+                boxes = getattr(result, "boxes", None)
+                print("✅ Inference finished")
+                print(f"Masks: {masks}, Boxes: {boxes}")
         
-        try:
-            img = cv2.imread(image_path)
+                # Features extracted by hook (optional)
+                features = features_dict.get("feat", None)
+                if features is not None:
+                    print(f"✅ Features extracted, length: {features.shape}")
         
-            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-                future = executor.submit(run_inference, img)
-                results = future.result()
+                return result, features
         
-            if results and len(results) > 0:
-                result = results[0]
+            except Exception as e:
+                print("❌ Inference failed:")
+                traceback.print_exc()
+                return None, None
         
-                # Check masks safely
-                if hasattr(result, 'masks') and result.masks is not None:
-                    print(f"✅ Inference finished, {len(result.masks)} mask(s) detected")
-                else:
-                    print("⚠️ No masks detected")
-                    result.masks = None
+        # -------------------- Example usage --------------------
+        image_path = "./images/input.png"
+        result, features = full_inference(image_path)
         
-                # You can still access boxes safely
-                if hasattr(result, 'boxes') and result.boxes is not None:
-                    print(f"{len(result.boxes)} bounding boxes detected")
-                else:
-                    result.boxes = None
-        
-            else:
-                print("⚠️ No results returned")
-                result = None
-        
-        except Exception as e:
-            import traceback
-            print("❌ Inference failed:")
-            traceback.print_exc()
-
+        if result:
+            print("Predictions ready")
+        else:
+            print("No predictions returned")
 
         
 ### Read original image
@@ -1057,6 +1086,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
+
 
 
 
