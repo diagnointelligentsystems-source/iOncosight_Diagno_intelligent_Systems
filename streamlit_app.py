@@ -1,3 +1,5 @@
+import os
+os.environ["STREAMLIT_SERVER_RUN_ON_SAVE_TIMEOUT"] = "600"
 import streamlit as st
 import time
 from datetime import datetime
