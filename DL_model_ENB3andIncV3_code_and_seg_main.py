@@ -440,14 +440,16 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         
-        results = model.predict(img_rgb, conf=0.01, iou=0.5, imgsz=512, device="cpu")
+        results = model.predict(img_rgb, conf=0.2, iou=0.5, imgsz=512, device="cpu")
         print("Raw results:", results)
         
         if results and len(results) > 0:
-            r = results[0]
-            print("Boxes:", getattr(r, "boxes", None))
-            print("Masks:", getattr(r, "masks", None))
+            result = results[0]
+            print("result got")
+            #print("Boxes:", getattr(r, "boxes", None))
+            #print("Masks:", getattr(r, "masks", None))
         else:
+            result=None 
             print("⚠️ No detections returned")
 
         
@@ -1046,6 +1048,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
+
 
 
 
