@@ -555,39 +555,46 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 
         ################3 changing label confidence score
         # -------- Step 1: Apply segmentation masks (without darkening background) --------
+        class_names = {0: "Mass", 1: "COPD", 2: "Normal"}
         if result.masks is not None and ens_ML_MCN_output<2 and  (masks  is not None):   # ✅ check before using (include both Mass and COPD)
-            # Convert cls_id to int safely
-            if isinstance(cls_id, (list, torch.Tensor)):
-                cls_id_scalar = int(cls_id[0])  # take first element if list/tensor
-            else:
-                cls_id_scalar = int(cls_id)
-
-            print('cls_id_scalar', cls_id_scalar)
-                # if cls_id>0:
-                #     continue
+            for mask, cls_id in zip(result.masks.data, result.boxes.cls):
+                # Convert cls_id to int safely
+                if isinstance(cls_id, (list, torch.Tensor)):
+                    cls_id_scalar = int(cls_id[0])  # take first element if list/tensor
+                else:
+                    cls_id_scalar = int(cls_id)
+                cls_id = cls_id_scalar
+                print('cls_id_scalar', cls_id_scalar)
+                    # if cls_id>0:
+                    #     continue
                 cls_name = class_names[cls_id]
                 color = class_colors[cls_name]
 
                 mask = mask.cpu().numpy().astype(np.uint8)
                 mask = cv2.resize(mask, (img.shape[1], img.shape[0]))
 
-                # Extract the region of interest (ROI) where mask==1
+                    # Extract the region of interest (ROI) where mask==1
                 roi = img[mask == 1]
 
-                # Create same-shape color array
+                    # Create same-shape color array
                 color_arr = np.full_like(roi, color, dtype=np.uint8)
 
-                # Blend only masked region
+                    # Blend only masked region
                 blended = cv2.addWeighted(roi, 1 - alpha, color_arr, alpha, 0)
 
-                # Put back blended pixels
+                    # Put back blended pixels
                 img[mask == 1] = blended
 
             copd_p=0
             # -------- Step 2: Draw bounding boxes + labels (with white background) --------
-            class_names = {0: "Mass", 1: "COPD", 2: "Normal"}
             for box, cls_id, conf in zip(result.boxes.xyxy, result.boxes.cls, result.boxes.conf):
-                cls_id = int(cls_id)
+                if isinstance(cls_id, (list, torch.Tensor)):
+                    cls_id_scalar = int(cls_id[0])  # take first element if list/tensor
+                else:
+                    cls_id_scalar = int(cls_id)
+                cls_id=cls_id_scalar
+
+                print('cls_id_scalar', cls_id_scalar)
                 # if cls_id>0:
                 #     continue
                 cls_name = class_names[cls_id]
@@ -1080,4 +1087,3 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
-
