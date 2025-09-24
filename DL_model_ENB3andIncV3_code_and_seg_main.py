@@ -436,6 +436,8 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 
         #print('conf_ML',conf_ML)
         cv2.imwrite(output_path, img_p)
+        # delect
+        sel_ens_M1=sel_ens_M2=sel_ens_M3=scaled_ens_M1=scaled_ens_M2=scaled_ens_M3=ens_MCN=[]
         print('ex 3')
         ################3 changing label confidence score
         # -------- Step 1: Apply segmentation masks (without darkening background) --------
@@ -959,6 +961,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
