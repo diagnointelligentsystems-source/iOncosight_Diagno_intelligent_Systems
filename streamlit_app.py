@@ -162,6 +162,14 @@ scaled_ens_M1 = load_scaler("1_scaler_ALL_FEATURE_5m_SCORE_rf_f_classif_BOTH__mi
 scaled_ens_M2 = load_scaler("2_scaler_ALL_FEATURE_5m_SCORE_rf_mutual_info_classif_BOTH__min_max_w_fec.pkl")
 scaled_ens_M3 = load_scaler("3_scaler_ALL_FEATURE_3_MCN_xgb_mutual_info_classif__min_max_K_{k}.pkl")
 
+#Run inference
+        log_memory_usage("start")  # ~50 MB
+
+        big_list = [i for i in range(10**7)]
+        log_memory_usage("after big_list")  # jumps to ~300 MB (real)
+        
+        del big_list
+        log_memory_usage("after deleting big_list") 
 # ✅ Track number of runs
 if "run_count" not in st.session_state:
     st.session_state.run_count = 0
