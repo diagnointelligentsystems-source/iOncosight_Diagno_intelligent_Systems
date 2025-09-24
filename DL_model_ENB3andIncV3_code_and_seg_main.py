@@ -437,7 +437,20 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         
             if results and len(results) > 0:
                 result = results[0]
-                print("✅ Inference finished, result ready:", result)
+        
+                # Check masks safely
+                if hasattr(result, 'masks') and result.masks is not None:
+                    print(f"✅ Inference finished, {len(result.masks)} mask(s) detected")
+                else:
+                    print("⚠️ No masks detected")
+                    result.masks = None
+        
+                # You can still access boxes safely
+                if hasattr(result, 'boxes') and result.boxes is not None:
+                    print(f"{len(result.boxes)} bounding boxes detected")
+                else:
+                    result.boxes = None
+        
             else:
                 print("⚠️ No results returned")
                 result = None
@@ -446,9 +459,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             import traceback
             print("❌ Inference failed:")
             traceback.print_exc()
-            result = None
-        
-        log_memory("after inference")
+
 
         
 ### Read original image
@@ -1046,6 +1057,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
+
 
 
 
