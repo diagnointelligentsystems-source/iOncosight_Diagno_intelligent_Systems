@@ -431,6 +431,8 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             return results[0]
         
         # -------------------- Main inference wrapper --------------------
+        import torch
+        torch.set_num_threads(2)
         img = cv2.imread(image_path)
         if img is None:
             raise ValueError("Image not found")
@@ -1044,6 +1046,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
+
 
 
 
