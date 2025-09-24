@@ -522,8 +522,19 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         #print(sfdsfsgag)
         ###### feature extraction
         print('ex 1_5')
+        # Extract features directly from the hook 
+        features_dict = {}
+
+        def hook_fn(module, input, output):
+            pooled = torch.mean(output[0], dim=(1, 2))  # Global Average Pooling
+            features_dict['feat'] = pooled.detach().cpu().numpy()
+
+        try:
+            hook = model.model.model[10].register_forward_hook(hook_fn)
+        except Exception as e:
+            print(f"❌ Failed to register hook: {e}")
         # Extract features directly from the hook
-        feat = features_dict.get("feat", None)
+        feat = features_dict.get('feat', None)
         ens_ML_MCN_output=60
         conf_ML=[]
         if feat is not None:
