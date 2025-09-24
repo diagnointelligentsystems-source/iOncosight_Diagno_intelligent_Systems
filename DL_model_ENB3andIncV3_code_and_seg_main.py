@@ -403,49 +403,50 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         
         torch.set_num_threads(2)
         
-        # Before loading model
-        print_free_memory()
-        log_memory("before loading model")
-        
+        # Hook function
         features_dict = {}
         def hook_fn(module, input, output):
             pooled = torch.mean(output[0], dim=(1, 2))  # Global Average Pooling
             features_dict['feat'] = pooled.detach().cpu().numpy()
         
-        try:
-            hook = model.model.model[10].register_forward_hook(hook_fn)
-        except Exception as e:
-            print(f"❌ Failed to register hook: {e}")
-        print('hook passed')
-        
-        log_memory("after loading model")
-        
-        # ---------- Inference ----------
-        def run_inference(img):
+        # -------- Inference function (GLOBAL scope, not nested) --------
+        def run_inference(image_path):
+            img = cv2.imread(image_path)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             results = model.predict(img, conf=0.2, iou=0.5, imgsz=512, device="cpu")
             return results
         
-        try:
-            img = cv2.imread(image_path)
+        # -------- Main code --------
+        print_free_memory()
+        log_memory("before loading model")
         
-            # Run inference in separate process
+        try:
+            hook = model.model.model[10].register_forward_hook(hook_fn)
+        except Exception as e:
+            print(f"❌ Failed to register hook: {e}")
+        print("hook passed")
+        
+        log_memory("after loading model")
+        
+        try:
+            # Run inference in a separate process
             with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
-                future = executor.submit(run_inference, img)
+                future = executor.submit(run_inference, image_path)
                 results = future.result()
         
-            print("✅ Inference finished")
+            if results and len(results) > 0:
+                result = results[0]
+                print("✅ Inference finished, result ready:", result)
+            else:
+                print("⚠️ No results returned")
         except Exception as e:
             import traceback
             print("❌ Inference failed:")
             traceback.print_exc()
         
         log_memory("after inference")
-        
-        # Access first result
-        result = results[0]
-        print("Result ready:", result)
 
+        
 ### Read original image
         img_p = cv2.imread(image_path)
 ##        #img = cv2.imread(image_path)
@@ -1041,6 +1042,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
+
 
 
 
