@@ -370,9 +370,24 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         img_samp = cv2.imread(image_path)
         print('image_path :',image_path)
         print("img_samp shape:", img_samp.shape)
+      # Run inference
+        log_memory_usage("start")  # ~50 MB
+
+        big_list = [i for i in range(10**7)]
+        log_memory_usage("after big_list")  # jumps to ~300 MB (real)
+        
+        del big_list
+        log_memory_usage("after deleting big_list") 
         import torch
         from tqdm import tqdm
+        # Run inference
+        log_memory_usage("start")  # ~50 MB
 
+        big_list = [i for i in range(10**7)]
+        log_memory_usage("after big_list")  # jumps to ~300 MB (real)
+        
+        del big_list
+        log_memory_usage("after deleting big_list") 
         features_dict = {}
 
         def hook_fn(module, input, output):
@@ -387,6 +402,14 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         results = model(image_path, conf=0.2, iou=0.5, imgsz=1024, device="cpu")
         print('ex 1_2_3')
         result = results[0]
+      # Run inference
+        log_memory_usage("start")  # ~50 MB
+
+        big_list = [i for i in range(10**7)]
+        log_memory_usage("after big_list")  # jumps to ~300 MB (real)
+        
+        del big_list
+        log_memory_usage("after deleting big_list") 
         print('ex 1_3')
         # Read original image
         img=img_p = cv2.imread(image_path)
@@ -969,6 +992,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
