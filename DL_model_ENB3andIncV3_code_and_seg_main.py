@@ -352,10 +352,10 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     plt.close('all')
     print('ex 1')
     #### delecting un used data
-    del loaded_SVM_model
+   #delloaded_SVM_model
     del eff_model,inc_model
-    del loaded_model
-    del rf_chi2_ens,st_ens_LC_NR,rf_mi_ens,xgb_chi2_ens
+   #delloaded_model
+   #delrf_chi2_ens,st_ens_LC_NR,rf_mi_ens,xgb_chi2_ens
     ########################## segmentation model
     output_path = "./images_YOLOV11/V11_input.png"
     try: #if 1==1:#predicted_value[0]!=1:
@@ -545,7 +545,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             # print('conf_ML',conf_ML)
             cv2.imwrite(output_path, img_p)
             # delect
-            del sel_ens_M1, sel_ens_M2, sel_ens_M3, scaled_ens_M1, scaled_ens_M2, scaled_ens_M3, ens_MCN
+            #delsel_ens_M1, sel_ens_M2, sel_ens_M3, scaled_ens_M1, scaled_ens_M2, scaled_ens_M3, ens_MCN
             print('ex 3')
         else:
             print("⚠️ Feature was not extracted.")
@@ -1080,11 +1080,10 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     plt.close('all')
     del results
     del result
-    del model
+    #delmodel
     #del df
-    del img, img1
+    #delimg, img1
     gc.collect()
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
-
