@@ -414,12 +414,24 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         log_memory("after loading model")
         
         try:
-          img = cv2.imread(image_path)
+          img =img_p = cv2.imread(image_path)
           img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-          results = model.predict(img, conf=0.2, iou=0.5, imgsz=640, device="cpu")  
-          print("✅ Inference done")
-          #results = model(image_path, conf=0.2, iou=0.5, imgsz=1024, device="cpu")
-          log_memory("after inference")
+          import concurrent.futures
+          def run_inference(image_path):
+              img = cv2.imread(image_path)
+              img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+              results = model.predict(img, conf=0.2, iou=0.5, imgsz=640, device="cpu")
+              return results
+          
+          # Run in background thread
+          with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+              future = executor.submit(run_inference, image_path)
+          
+              # Wait for result (blocking, but outside Streamlit’s main loop)
+              results = future.result()
+          
+          # After using results
+          print("✅ Inference finished")
         except Exception as e:
           import traceback
           print("❌ Inference failed:")
@@ -428,53 +440,51 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         log_memory("after inference") 
         print('ex 1_2_3')
         result = results[0]
-        # Run inference
-        #print_free_memory() 
-        print('ex 1_3')
-        # Read original image
-        img=img_p = cv2.imread(image_path)
-        #img = cv2.imread(image_path)
-        if img is None:
-            raise FileNotFoundError(f"Image not found: {image_path}")
-        #print('*0')
-        # Run inference
-        print_free_memory() 
-        print('ex 1_4')
-        if result.masks is None:   # ✅ check before using
-            print('*1')
-            del results,result
-            try:
-                print('image_path',image_path)
-                img = cv2.imread(image_path)
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                results = model.predict(img, conf=0.1, iou=0.5, imgsz=640, device="cpu") 
-                #results = model.predict(img, conf=0.1, iou=0.5, imgsz=640, device="cpu") #model(image_path, conf=0.1, iou=0.5, imgsz=1024, device="cpu")
-                result = results[0]
-                log_memory("after inference")
-            except Exception as e:
-                import traceback
-                print("❌ Inference failed:")
-                traceback.print_exc()            
-            # if result.masks is not None:
-            #     print('*11')
-        if result.masks is None:   # ✅ check before using
-            del results,result
-            try:              
-                print('image_path',image_path)
-                img = cv2.imread(image_path)
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                results = model.predict(img, conf=0.05, iou=0.5, imgsz=640, device="cpu")   
-              #results = model(image_path, conf=0.05, iou=0.5, imgsz=1024, device="cpu")
-                result = results[0]
-                log_memory("after inference")
-            except Exception as e:
-                import traceback
-                print("❌ Inference failed:")
-                traceback.print_exc() 
-            print('*22')
-            if result.masks is None:
-                print(" No segmentation detected even after multiple inference attempts.")
-                print('*2###############################################')
+### Read original image
+##        img=img_p = cv2.imread(image_path)
+##        #img = cv2.imread(image_path)
+##        if img is None:
+##            raise FileNotFoundError(f"Image not found: {image_path}")
+##        #print('*0')
+##        # Run inference
+##        print_free_memory() 
+##        print('ex 1_4')
+##        if result.masks is None:   # ✅ check before using
+##            print('*1')
+##            del results,result
+##            try:
+##                print('image_path',image_path)
+##                img = cv2.imread(image_path)
+##                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+##                results = model.predict(img, conf=0.1, iou=0.5, imgsz=640, device="cpu") 
+##                #results = model.predict(img, conf=0.1, iou=0.5, imgsz=640, device="cpu") #model(image_path, conf=0.1, iou=0.5, imgsz=1024, device="cpu")
+##                result = results[0]
+##                log_memory("after inference")
+##            except Exception as e:
+##                import traceback
+##                print("❌ Inference failed:")
+##                traceback.print_exc()            
+##            # if result.masks is not None:
+##            #     print('*11')
+##        if result.masks is None:   # ✅ check before using
+##            del results,result
+##            try:              
+##                print('image_path',image_path)
+##                img = cv2.imread(image_path)
+##                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+##                results = model.predict(img, conf=0.05, iou=0.5, imgsz=640, device="cpu")   
+##              #results = model(image_path, conf=0.05, iou=0.5, imgsz=1024, device="cpu")
+##                result = results[0]
+##                log_memory("after inference")
+##            except Exception as e:
+##                import traceback
+##                print("❌ Inference failed:")
+##                traceback.print_exc() 
+##            print('*22')
+##            if result.masks is None:
+##                print(" No segmentation detected even after multiple inference attempts.")
+##                print('*2###############################################')
+
         #print(sfdsfsgag)
         ###### feature extraction
         print('ex 1_5')
@@ -1026,6 +1036,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
