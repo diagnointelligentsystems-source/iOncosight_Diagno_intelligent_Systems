@@ -23,6 +23,10 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         st.write(f"💾 Available Memory: {mem.available / (1024**3):.2f} GB")
         st.write(f"💾 Used Memory: {mem.used / (1024**3):.2f} GB")
         st.write(f"💾 Memory Usage: {mem.percent}%")
+        print(f"💾 Total Memory: {mem.total / (1024**3):.2f} GB")
+        print(f"💾 Available Memory: {mem.available / (1024**3):.2f} GB")
+        print(f"💾 Used Memory: {mem.used / (1024**3):.2f} GB")
+        print(f"💾 Memory Usage: {mem.percent}%")
     
     # Example usage
     print_free_memory()
@@ -396,13 +400,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         import torch
         from tqdm import tqdm
         # Run inference
-        log_memory_usage("start")  # ~50 MB
-
-        big_list = [i for i in range(10**7)]
-        log_memory_usage("after big_list")  # jumps to ~300 MB (real)
-        
-        del big_list
-        log_memory_usage("after deleting big_list") 
+        print_free_memory() 
         features_dict = {}
 
         def hook_fn(module, input, output):
@@ -417,14 +415,8 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         results = model(image_path, conf=0.2, iou=0.5, imgsz=1024, device="cpu")
         print('ex 1_2_3')
         result = results[0]
-      # Run inference
-        log_memory_usage("start")  # ~50 MB
-
-        big_list = [i for i in range(10**7)]
-        log_memory_usage("after big_list")  # jumps to ~300 MB (real)
-        
-        del big_list
-        log_memory_usage("after deleting big_list") 
+        # Run inference
+        print_free_memory() 
         print('ex 1_3')
         # Read original image
         img=img_p = cv2.imread(image_path)
@@ -433,13 +425,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             raise FileNotFoundError(f"Image not found: {image_path}")
         #print('*0')
         # Run inference
-        log_memory_usage("start")  # ~50 MB
-
-        big_list = [i for i in range(10**7)]
-        log_memory_usage("after big_list")  # jumps to ~300 MB (real)
-        
-        del big_list
-        log_memory_usage("after deleting big_list") 
+        print_free_memory() 
         print('ex 1_4')
         if result.masks is None:   # ✅ check before using
             print('*1')
@@ -1007,6 +993,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
