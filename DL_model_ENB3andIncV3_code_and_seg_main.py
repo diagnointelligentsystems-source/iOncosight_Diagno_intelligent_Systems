@@ -585,6 +585,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 
             copd_p=0
             # -------- Step 2: Draw bounding boxes + labels (with white background) --------
+            class_names = {0: "Mass", 1: "COPD", 2: "Normal"}
             for box, cls_id, conf in zip(result.boxes.xyxy, result.boxes.cls, result.boxes.conf):
                 cls_id = int(cls_id)
                 # if cls_id>0:
@@ -1079,3 +1080,4 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed')
     ################3
     return imp_result,max_confidence_ML
+
