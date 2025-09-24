@@ -27,6 +27,10 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         print(f"💾 Available Memory: {mem.available / (1024**3):.2f} GB")
         print(f"💾 Used Memory: {mem.used / (1024**3):.2f} GB")
         print(f"💾 Memory Usage: {mem.percent}%")
+    def log_memory(note=""):
+      process = psutil.Process()
+      print(f"[{note}] RSS memory: {process.memory_info().rss / (1024**2):.2f} MB")
+
     
     # Example usage
     print_free_memory()
@@ -390,19 +394,12 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         print('image_path :',image_path)
         print("img_samp shape:", img_samp.shape)
       # Run inference
-        log_memory_usage("start")  # ~50 MB
-
-        big_list = [i for i in range(10**7)]
-        log_memory_usage("after big_list")  # jumps to ~300 MB (real)
-        
-        del big_list
-        log_memory_usage("after deleting big_list") 
         import torch
         from tqdm import tqdm
         # Run inference
         print_free_memory() 
         features_dict = {}
-
+        log_memory("before loading model")
         def hook_fn(module, input, output):
             pooled = torch.mean(output[0], dim=(1, 2))  # Global Average Pooling
             features_dict['feat'] = pooled.detach().cpu().numpy()
@@ -411,8 +408,13 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             hook = model.model.model[10].register_forward_hook(hook_fn)
         except Exception as e:
             print(f"❌ Failed to register hook: {e}")
-            
+        print('hook passed')
+              # load model
+        log_memory("after loading model")
+        
         results = model(image_path, conf=0.2, iou=0.5, imgsz=1024, device="cpu")
+        # inference
+        log_memory("after inference") 
         print('ex 1_2_3')
         result = results[0]
         # Run inference
@@ -993,6 +995,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ################3
 
     return imp_result,max_confidence_ML
+
 
 
 
