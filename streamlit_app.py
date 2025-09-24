@@ -13,6 +13,8 @@ import os
 from huggingface_hub import hf_hub_download, whoami
 import joblib
 from ultralytics import YOLO
+import ultralytics
+print(ultralytics.__version__)
 import gc
 import psutil
 # ----------------------------
