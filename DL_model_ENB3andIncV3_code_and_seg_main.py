@@ -353,7 +353,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 1')
     #### delecting un used data
    #delloaded_SVM_model
-    del eff_model,inc_model
+    #del eff_model,inc_model
    #delloaded_model
    #delrf_chi2_ens,st_ens_LC_NR,rf_mi_ens,xgb_chi2_ens
     ########################## segmentation model
