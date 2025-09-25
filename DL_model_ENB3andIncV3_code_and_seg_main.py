@@ -479,7 +479,14 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             result = None
         
 ### Read original image
-        img_p = cv2.imread(image_path)
+        import sys
+
+        img_samp = cv2.imread(image_path)
+        if img_samp is None:
+            print(f"❌ Could not read image: {image_path}", flush=True)
+        else:
+            print(f"✅ img_samp shape: {img_samp.shape}", flush=True)
+            sys.stdout.flush()  # force flush to terminal
 ##        #img = cv2.imread(image_path)
 ##        if img is None:
 ##            raise FileNotFoundError(f"Image not found: {image_path}")
