@@ -522,7 +522,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         if hook is not None:
             hook.remove()
             print("ℹ️ Hook removed", flush=True) 
-        print('ex 2')
+        print('ex 2', flush=True)
         ######### ML results
 
         ################3 changing label confidence score
@@ -558,7 +558,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 cls_name = class_names[cls_id_scalar]
                 color = class_colors[cls_name]
 
-                print("cls_id_scalar", cls_id_scalar)
+                print("cls_id_scalar", cls_id_scalar, flush=True)
 
                 x1, y1, x2, y2 = map(int, box)
                 cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
@@ -673,7 +673,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                     minor_len=float(min_len), minor_p1=q1, minor_p2=q2, minor_angle_deg=min_angle_deg
                 )
 
-            print('ex 5')
+            print('ex 5', flush=True)
             # ==================== main ====================
 
             def process_segmentation(image_path, results,predicted_value):
@@ -682,7 +682,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 H, W = orig_img.shape[:2]
 
                 if results[0].masks is None:
-                    print("No segmentation detected.")
+                    print("No segmentation detected.", flush=True)
                     return copd_p
 
                 masks = results[0].masks.data.cpu().numpy()
@@ -845,7 +845,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                             # Start y above the bounding box (or inside if too close to top)
                             y0 = max(y - 10, 20)
                             dy = 30
-                            print("overlay Image shape:", overlay.shape)
+                            print("overlay Image shape:", overlay.shape, flush=True)
                             for i, t in enumerate(txt):
                                 yy = y0 + i * dy
                                 if i == 0:  # label + confidence → red text on yellow background
@@ -898,12 +898,12 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 return copd_p
 
             copd_p=process_segmentation(image_path, results,predicted_value)
-            print('ex 6')
+            print('ex 6', flush=True)
     #else:
      #   print('predicted output: Non-Lung Cancer')
     #print('classfier_output',predicted_value[0])
     except Exception as e:
-        print("⚠️ An error occurred in process_segmentation:")
+        print("⚠️ An error occurred in process_segmentation:", flush=True)
         traceback.print_exc()   # prints full traceback with line number
         raise  # re-raise so the real error propagates
     #############3
@@ -922,11 +922,11 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         if os.path.exists(csv_path):
             try:
                 df = pd.read_csv(csv_path)
-                print("CSV loaded successfully:", csv_path)
+                print("CSV loaded successfully:", csv_path, flush=True)
             except EmptyDataError:
-                print("CSV file exists but is empty:", csv_path)
+                print("CSV file exists but is empty:", csv_path, flush=True)
         else:
-            print("CSV file does not exist:", csv_path)
+            print("CSV file does not exist:", csv_path, flush=True)
 
         # ✅ Only run this block if df was successfully loaded
         if df is not None and not df.empty:
@@ -936,7 +936,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 has_copd = (df["Class"] == "COPD").any()
             else:
                 has_mass = has_copd = False
-                print("⚠️ 'Class' column not found in CSV")
+                print("⚠️ 'Class' column not found in CSV", flush=True)
 
             if predicted_value[0] == 0:
                 max_confidence_ML = predicted_proba_DL
