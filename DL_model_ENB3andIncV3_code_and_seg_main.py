@@ -449,12 +449,16 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         results = model(image_path, conf=0.2, iou=0.5, imgsz=512, device="cpu")
         #results = model.predict(img_rgb, conf=0.2, iou=0.5, imgsz=512, device="cpu")
         print("Raw results:", results)
+        print(len(results))
 
         if results and len(results) > 0:
+            print('[1]')
             result = results[0]
+            print('[2]')
             boxes = getattr(result, "boxes", None)
+            print('[3]')
             masks = getattr(result, "masks", None)
-
+            print('[4]')
             # Check boxes
             if boxes is not None and len(boxes.xyxy) > 0:
                 print("✅ Detections found")
