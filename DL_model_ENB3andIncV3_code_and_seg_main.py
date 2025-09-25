@@ -485,7 +485,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 ##        print('ex 1_4')
 ##        if result.masks is None:   # ✅ check before using
 ##            print('*1')
-##            del results,result
+##            ##del results,result
 ##            try:
 ##                print('image_path',image_path)
 ##                img = cv2.imread(image_path)
@@ -501,7 +501,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 ##            # if result.masks is not None:
 ##            #     print('*11')
 ##        if result.masks is None:   # ✅ check before using
-##            del results,result
+##            ##del results,result
 ##            try:              
 ##                print('image_path',image_path)
 ##                img = cv2.imread(image_path)
@@ -1089,8 +1089,8 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     if imp_result=='Lung Cancer':
       shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
     plt.close('all')
-    del results
-    del result
+    ##del results
+    #del result
     #delmodel
     #del df
     #delimg, img1
