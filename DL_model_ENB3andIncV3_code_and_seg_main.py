@@ -529,80 +529,66 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         ################3 changing label confidence score
         # -------- Step 1: Apply segmentation masks (without darkening background) --------
         class_names = {0: "Mass", 1: "COPD", 2: "Normal"}
-        if result.masks is not None and ens_ML_MCN_output<2 and  (masks  is not None):   # ✅ check before using (include both Mass and COPD)
+
+        if result.masks is not None and ens_ML_MCN_output < 2 and (masks is not None):  # ✅ safe check
+            # -------- Step 1: Overlay masks --------
             for mask, cls_id in zip(result.masks.data, result.boxes.cls):
-                # Convert cls_id to int safely
-                if isinstance(cls_id, (list, torch.Tensor)):
-                    cls_id_scalar = int(cls_id[0])  # take first element if list/tensor
-                else:
-                    cls_id_scalar = int(cls_id)
-                cls_id = cls_id_scalar
-                print('cls_id_scalar', cls_id_scalar)
-                    # if cls_id>0:
-                    #     continue
-                cls_name = class_names[cls_id]
+                cls_id_scalar = int(cls_id.item() if torch.is_tensor(cls_id) else cls_id) 
+                cls_name = class_names[cls_id_scalar]
                 color = class_colors[cls_name]
 
                 mask = mask.cpu().numpy().astype(np.uint8)
                 mask = cv2.resize(mask, (img.shape[1], img.shape[0]))
 
-                    # Extract the region of interest (ROI) where mask==1
+                # Extract the region of interest (ROI) where mask==1
                 roi = img[mask == 1]
 
-                    # Create same-shape color array
+                # Create same-shape color array
                 color_arr = np.full_like(roi, color, dtype=np.uint8)
 
-                    # Blend only masked region
+                # Blend only masked region
                 blended = cv2.addWeighted(roi, 1 - alpha, color_arr, alpha, 0)
 
-                    # Put back blended pixels
+                # Put back blended pixels
                 img[mask == 1] = blended
 
-            copd_p=0
+            copd_p = 0
             # -------- Step 2: Draw bounding boxes + labels (with white background) --------
             for box, cls_id, conf in zip(result.boxes.xyxy, result.boxes.cls, result.boxes.conf):
-                if isinstance(cls_id, (list, torch.Tensor)):
-                    cls_id_scalar = int(cls_id[0])  # take first element if list/tensor
-                else:
-                    cls_id_scalar = int(cls_id)
-                cls_id=cls_id_scalar
-
-                print('cls_id_scalar', cls_id_scalar)
-                # if cls_id>0:
-                #     continue
-                cls_name = class_names[cls_id]
+                cls_id_scalar = int(cls_id.item() if torch.is_tensor(cls_id) else cls_id)
+                cls_name = class_names[cls_id_scalar]
                 color = class_colors[cls_name]
+
+                print("cls_id_scalar", cls_id_scalar)
 
                 x1, y1, x2, y2 = map(int, box)
                 cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
 
                 # Build label with confidence
-                conf=conf_ML
+                conf = conf_ML  # ⚠️ you overwrite here — intentional?
                 label = f"{cls_name} {conf:.0f}%"
-                label_w=cls_name
+                label_w = cls_name
 
                 # Get text size
                 (font_w, font_h), baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.9, 2)
 
                 # White background rectangle
-                cv2.rectangle(img,
-                              (x1, y1 - font_h - baseline),
-                              (x1 + font_w, y1),
-                              (255, 255, 255), -1)
+                cv2.rectangle(
+                    img,
+                    (x1, y1 - font_h - baseline),
+                    (x1 + font_w, y1),
+                    (255, 255, 255), -1
+                )
 
                 # Text on top of white background
-                if ens_ML_MCN_output==2:
-                    color1=(0,0,0)
-                    cv2.putText(img, label,
-                                (x1, y1 - 5),
+                if ens_ML_MCN_output == 2:
+                    cv2.putText(img, label, (x1, y1 - 5),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.9,
-                                color1, 2)
+                                (0, 0, 0), 2)
                 else:
-                    #print('label+++++++++++++++++++++++++++++++',label)
-                    if 'COPD'==label_w:
+                    if label_w == "COPD":
                         copd_p = 1
-                    cv2.putText(img, label,
-                                (x1, y1 - 5),
+                    cv2.putText(img, label, (x1, y1 - 5),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.9,
                                 color, 2)
 
