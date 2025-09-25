@@ -431,109 +431,27 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             return results[0]
         
         # -------------------- Main inference wrapper --------------------
-        import torch
+        import os
+        import sys
         import cv2
-        masks=None
+        import torch
+        import pandas as pd
+
         torch.set_num_threads(2)
 
+        # ---------- Load image ----------
         img = cv2.imread(image_path)
         if img is None:
-            raise ValueError("Image not found")
+            raise ValueError(f"❌ Image not found: {image_path}")
 
-        # Convert grayscale to RGB if needed
+        # Ensure RGB (YOLO expects 3 channels)
         if len(img.shape) != 3 or img.shape[2] != 3:
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        # Run inference
-        results = model(image_path, conf=0.2, iou=0.5, imgsz=512, device="cpu")
-        #results = model.predict(img_rgb, conf=0.2, iou=0.5, imgsz=512, device="cpu")
-        print("Raw results:", results)
-        print(len(results))
+        print(f"✅ orig img shape: {img.shape}", flush=True)
 
-        if results and len(results) > 0:
-            print('[1]')
-            result = results[0]
-            print('[2]')
-            boxes = getattr(result, "boxes", None)
-            print('[3]')
-            masks = getattr(result, "masks", None)
-            print('[4]')
-            # Check boxes
-            if boxes is not None and len(boxes.xyxy) > 0:
-                print("✅ Detections found")
-                print("Boxes (x1, y1, x2, y2, conf, class_id):")
-                print(boxes.xyxy)
-                class_ids = boxes.cls
-                print("Predicted classes:", [result.names[int(c)] for c in class_ids])
-            else:
-                print("⚠️ No boxes found")
-
-            # Check masks
-            if masks is not None:
-                print("Masks available")
-            else:
-                print("No masks (detection-only model)")
-        else:
-            print("⚠️ No detections returned")
-            result = None
-        
-### Read original image
-        import sys
-
-        img_samp = cv2.imread(image_path)
-        if img_samp is None:
-            print(f"❌ Could not read image: {image_path}", flush=True)
-        else:
-            print(f"✅ img_samp shape: {img_samp.shape}", flush=True)
-            sys.stdout.flush()  # force flush to terminal
-##        #img = cv2.imread(image_path)
-##        if img is None:
-##            raise FileNotFoundError(f"Image not found: {image_path}")
-##        #print('*0')
-##        # Run inference
-##        print_free_memory() 
-##        print('ex 1_4')
-##        if result.masks is None:   # ✅ check before using
-##            print('*1')
-##            ##del results,result
-##            try:
-##                print('image_path',image_path)
-##                img = cv2.imread(image_path)
-##                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-##                results = model.predict(img, conf=0.1, iou=0.5, imgsz=640, device="cpu") 
-##                #results = model.predict(img, conf=0.1, iou=0.5, imgsz=640, device="cpu") #model(image_path, conf=0.1, iou=0.5, imgsz=1024, device="cpu")
-##                result = results[0]
-##                log_memory("after inference")
-##            except Exception as e:
-##                import traceback
-##                print("❌ Inference failed:")
-##                traceback.print_exc()            
-##            # if result.masks is not None:
-##            #     print('*11')
-##        if result.masks is None:   # ✅ check before using
-##            ##del results,result
-##            try:              
-##                print('image_path',image_path)
-##                img = cv2.imread(image_path)
-##                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-##                results = model.predict(img, conf=0.05, iou=0.5, imgsz=640, device="cpu")   
-##              #results = model(image_path, conf=0.05, iou=0.5, imgsz=1024, device="cpu")
-##                result = results[0]
-##                log_memory("after inference")
-##            except Exception as e:
-##                import traceback
-##                print("❌ Inference failed:")
-##                traceback.print_exc() 
-##            print('*22')
-##            if result.masks is None:
-##                print(" No segmentation detected even after multiple inference attempts.")
-##                print('*2###############################################')
-
-        #print(sfdsfsgag)
-        ###### feature extraction
-        print('ex 1_5')
-        # Extract features directly from the hook 
+        # ---------- Setup hook for feature extraction ----------
         features_dict = {}
 
         def hook_fn(module, input, output):
@@ -542,36 +460,69 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 
         try:
             hook = model.model.model[10].register_forward_hook(hook_fn)
+            print("✅ Hook registered", flush=True)
         except Exception as e:
-            print(f"❌ Failed to register hook: {e}")
-        # Extract features directly from the hook
+            print(f"❌ Failed to register hook: {e}", flush=True)
+            hook = None
+
+        # ---------- Run inference ----------
+        results = model(image_path, conf=0.2, iou=0.5, imgsz=512, device="cpu")
+        print("Raw results:", results, flush=True)
+        print("Results length:", len(results), flush=True)
+
+        result = None
+        if results and len(results) > 0:
+            result = results[0]
+            boxes = getattr(result, "boxes", None)
+            masks = getattr(result, "masks", None)
+
+            if boxes is not None and len(boxes.xyxy) > 0:
+                print("✅ Detections found", flush=True)
+                print("Boxes (x1, y1, x2, y2, conf, class_id):", flush=True)
+                print(boxes.xyxy, flush=True)
+                class_ids = boxes.cls
+                print("Predicted classes:", [result.names[int(c)] for c in class_ids], flush=True)
+            else:
+                print("⚠️ No boxes found", flush=True)
+
+            if masks is not None:
+                print("Masks available", flush=True)
+            else:
+                print("No masks (detection-only model)", flush=True)
+        else:
+            print("⚠️ No detections returned", flush=True)
+
+        # ---------- Feature extraction ----------
         feat = features_dict.get('feat', None)
-        ens_ML_MCN_output=60
-        conf_ML=predicted_proba_DL
+        ens_ML_MCN_output = 60
+        conf_ML = predicted_proba_DL  # comes from earlier context
+
         if feat is not None:
-            print(f"✅ Feature length: {feat.shape}")
-            # Save to CSV
+            print(f"✅ Feature shape: {feat.shape}", flush=True)
+
             row = [os.path.basename(image_path), 10] + feat.tolist()
             df = pd.DataFrame([row], columns=['filename', 'label'] + [f'feat_{i}' for i in range(len(feat))])
             df.to_csv('./yolov11_MCN_whole_features_test.csv', index=False)
-            import ens_modelling_MCN_test_fn
+            print("✅ Features saved to CSV", flush=True)
 
-            ens_ML_MCN_output, predicted_proba1 = ens_modelling_MCN_test_fn.ens_ML_MCN(sel_ens_M1, sel_ens_M2,
-                                                                                      sel_ens_M3, scaled_ens_M1,
-                                                                                      scaled_ens_M2, scaled_ens_M3,
-                                                                                      ens_MCN)
-            # print("Ens ML results:", ens_ML_MCN_output)
+            import ens_modelling_MCN_test_fn
+            ens_ML_MCN_output, predicted_proba1 = ens_modelling_MCN_test_fn.ens_ML_MCN(
+                sel_ens_M1, sel_ens_M2, sel_ens_M3, scaled_ens_M1, scaled_ens_M2, scaled_ens_M3, ens_MCN
+            )
+
             predicted_proba1 = predicted_proba1[0]
             conf_ML = predicted_proba1[ens_ML_MCN_output] * 100
 
-            # print('conf_ML',conf_ML)
             cv2.imwrite(output_path, img_p)
-            # delect
-            #delsel_ens_M1, sel_ens_M2, sel_ens_M3, scaled_ens_M1, scaled_ens_M2, scaled_ens_M3, ens_MCN
-            print('ex 3')
+            print("ex 3", flush=True)
         else:
-            print("⚠️ Feature was not extracted.")
-        #model = yolov11=[]
+            print("⚠️ Feature was not extracted.", flush=True)
+
+        # ---------- Cleanup hook ----------
+        if hook is not None:
+            hook.remove()
+            print("ℹ️ Hook removed", flush=True)
+      #model = yolov11=[]
         print('ex 2')
         ######### ML results
 
