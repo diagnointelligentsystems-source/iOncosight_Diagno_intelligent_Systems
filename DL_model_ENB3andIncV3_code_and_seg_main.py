@@ -560,7 +560,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
             print('ex 3')
         else:
             print("⚠️ Feature was not extracted.")
-        model = yolov11=[]
+        #model = yolov11=[]
         print('ex 2')
         ######### ML results
 
