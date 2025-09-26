@@ -17,7 +17,7 @@ from huggingface_hub import hf_hub_download, whoami
 import joblib
 from ultralytics import YOLO
 import ultralytics
-print(ultralytics.__version__)
+print(ultralytics.__version__ , flush=True)
 import gc
 import psutil
 # ----------------------------
@@ -895,7 +895,7 @@ import os
 
 # Get the current script directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
-print('current_dir')
+print('current_dir', flush=True)
 # Build the logo path relative to current directory
 logo_path = os.path.join(current_dir, "LOGO.jpg")
 #logo_path = "./LOGO.jpg"
@@ -1240,7 +1240,7 @@ with col2:
                 if os.path.isfile(file_path):
                     os.remove(file_path)
             except Exception as e:
-                print(f"Error deleting {file_path}: {e}")
+                print(f"Error deleting {file_path}: {e}", flush=True)
         ######
         import random
         # import cv2
@@ -1297,7 +1297,7 @@ with col2:
         imp_result,max_confidence_ML = full_code(output_path, eff_model, inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,ens_scaler_rf_chi2,ens_scaler_xgb_chi2,ens_scaler_rf_mi,
                                                 st_ens_LC_NR,sel_ens_M1,sel_ens_M2,sel_ens_M3,scaled_ens_M1,scaled_ens_M2,scaled_ens_M3,ens_MCN,yolov11)
 
-        print('final_impression', imp_result)
+        print('final_impression', imp_result,, flush=True)
         #print('output image path :', imp_image_out)
         imp=imp_result
         max_confidence_ML=max_confidence_ML
@@ -1310,7 +1310,7 @@ with col2:
         Patient_Sex = "NA"
 
         end_time = time.time()
-        print(f"⏱️ Processing time: {end_time - start_time:.2f} seconds")
+        print(f"⏱️ Processing time: {end_time - start_time:.2f} seconds", flush=True)
         processing_time = f"{end_time - start_time:.2f} "
         ##############################################################################
 
