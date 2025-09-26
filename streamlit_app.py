@@ -1,10 +1,5 @@
 import os
 os.environ["STREAMLIT_WATCHDOG"] = "false"
-#os.environ["STREAMLIT_SERVER_RUN_ON_SAVE_TIMEOUT"] = "600"
-import streamlit as st
-import os
-os.environ["STREAMLIT_WATCHDOG"] = "false"
-
 import streamlit as st
 
 # Clear any old states at the very start
@@ -36,8 +31,6 @@ import ultralytics
 print(ultralytics.__version__ , flush=True)
 import gc
 import psutil
-# ----------------------------
-# Set Hugging Face token safely 
 # ----------------------------
 # Set Hugging Face token safely
 # ----------------------------
