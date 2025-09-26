@@ -1032,7 +1032,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                 imp_result = 'Non-Lung Cancer'
                 max_confidence_ML = predicted_proba_DL
                 imp_image_out="./result.jpg"#"./output_YOLOV11/Grad_cam_PRED.png"
-    print('ex 8')
+    print('ex 8', flush=True)
     if imp_result=='Lung Cancer':
       shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
     plt.close('all')
@@ -1042,7 +1042,6 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     #del df
     #delimg, img1
     gc.collect()
-    print('ex 9','Analysis completed')
+    print('ex 9','Analysis completed', flush=True)
     ################3
     return imp_result,max_confidence_ML
-
