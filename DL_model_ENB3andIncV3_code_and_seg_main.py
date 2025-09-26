@@ -1042,6 +1042,8 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     #del df
     #delimg, img1
     gc.collect()
+    print('imp_result',imp_result,'max_confidence_ML',max_confidence_ML, flush=True)
     print('ex 9','Analysis completed', flush=True)
     ################3
     return imp_result,max_confidence_ML
+
