@@ -6,6 +6,7 @@ def seg_code(yolov11,image_path,predicted_proba_DL,predicted_value,sel_ens_M1, s
     import torch
     import pandas as pd
     from PIL import Image
+    import traceback
     output_path = "./images_YOLOV11/V11_input.png"
     try: #if 1==1:#predicted_value[0]!=1:
         print('ex 1_1', flush=True)
@@ -645,4 +646,5 @@ def seg_code(yolov11,image_path,predicted_proba_DL,predicted_value,sel_ens_M1, s
     if imp_result=='Lung Cancer':
       shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
     plt.close('all')
+
     return imp_result, max_confidence_ML
