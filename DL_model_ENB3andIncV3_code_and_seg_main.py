@@ -367,7 +367,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     # Segmentation code
     import seg_code_v11
     from seg_code_v11 import seg_code
-    imp_result,max_confidence_ML=seg_code(yolov11,image_path,predicted_proba_DL,predicted_value,sel_ens_M1, sel_ens_M2, sel_ens_M3, scaled_ens_M1, scaled_ens_M2, scaled_ens_M3, ens_MCN)
+    imp_result,max_confidence_ML=seg_code(img_p,yolov11,image_path,predicted_proba_DL,predicted_value,sel_ens_M1, sel_ens_M2, sel_ens_M3, scaled_ens_M1, scaled_ens_M2, scaled_ens_M3, ens_MCN)
     ##del results
     #del result
     #delmodel
@@ -379,6 +379,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     plt.close('all')
     ################3
     return imp_result,max_confidence_ML
+
 
 
 
