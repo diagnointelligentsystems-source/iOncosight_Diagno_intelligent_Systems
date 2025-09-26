@@ -9,6 +9,7 @@ def seg_code(img_p,yolov11,image_path,predicted_proba_DL,predicted_value,sel_ens
     import traceback
     import psutil
     import shutil
+    import numpy as np
     output_path = "./images_YOLOV11/V11_input.png"
     try: #if 1==1:#predicted_value[0]!=1:
         print('ex 1_1', flush=True)
@@ -650,6 +651,7 @@ def seg_code(img_p,yolov11,image_path,predicted_proba_DL,predicted_value,sel_ens
     plt.close('all')
 
     return imp_result, max_confidence_ML
+
 
 
 
