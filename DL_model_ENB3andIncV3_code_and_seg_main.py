@@ -480,8 +480,8 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 
             if boxes is not None and len(boxes.xyxy) > 0:
                 print("✅ Detections found", flush=True)
-                print("Boxes (x1, y1, x2, y2, conf, class_id):", flush=True)
-                print(boxes.xyxy, flush=True)
+                #print("Boxes (x1, y1, x2, y2, conf, class_id):", flush=True)
+                #print(boxes.xyxy, flush=True)
                 class_ids = boxes.cls
                 print("Predicted classes:", [result.names[int(c)] for c in class_ids], flush=True)
             else:
@@ -1048,5 +1048,6 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed', flush=True)
     ################3
     return imp_result,max_confidence_ML
+
 
 
