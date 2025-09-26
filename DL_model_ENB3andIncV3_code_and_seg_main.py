@@ -300,98 +300,53 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     # Segmentation code
     #import seg_code_v11
     #from seg_code_v11 import seg_code
-    #imp_result,max_confidence_ML=seg_code(current_dir,img_p,yolov11,image_path,predicted_proba_DL,predicted_value,sel_ens_M1, sel_ens_M2, sel_ens_M3, scaled_ens_M1, scaled_ens_M2, scaled_ens_M3, ens_MCN)
-    
-    import streamlit as st
-    import multiprocessing
+    #imp_result,max_confidence_ML=seg_code(current_dir,img_p,yolov11,image_path,predicted_proba_DL,predicted_value,sel_ens_M1, sel_ens_M2, sel_ens_M3, scaled_ens_M1, scaled_ens_M2, scaled_ens_M3, ens_MCN)          
+    #import streamlit as st
+    import concurrent.futures
     import seg_code_v11
     from seg_code_v11 import seg_code
+    #import shutil  # <- needed for copy
     
-    TIMEOUT = 15   # seconds
-    MAX_RETRIES = 1
+    TIMEOUT = 15  # seconds
     
-    def run_seg_code(queue, params):
-        """Worker process to run seg_code and return results via queue."""
-        try:
-            imp_result, max_confidence_ML = seg_code(*params)
-            queue.put(("success", (imp_result, max_confidence_ML)))
-        except Exception as e:
-            queue.put(("error", str(e)))
+    inputs = (
+        current_dir, img_p, yolov11, image_path,
+        predicted_proba_DL, predicted_value,
+        sel_ens_M1, sel_ens_M2, sel_ens_M3,
+        scaled_ens_M1, scaled_ens_M2, scaled_ens_M3,
+        ens_MCN
+    )
     
-    
-    # -------------------------------
-    # Initialize retry counter
-    # -------------------------------
-    if "retry_count" not in st.session_state:
-        st.session_state.retry_count = 0
-    
-    # -------------------------------
-    # Save inputs once in session_state
-    # -------------------------------
-    if "seg_inputs" not in st.session_state:
-        st.session_state.seg_inputs = (
-            current_dir,img_p,yolov11,image_path,predicted_proba_DL,predicted_value,sel_ens_M1, sel_ens_M2, sel_ens_M3, scaled_ens_M1, scaled_ens_M2, scaled_ens_M3, ens_MCN
-
-        )
-    
-    # -------------------------------
-    # If result already available, skip running again
-    # -------------------------------
-    if "seg_result" in st.session_state:
-        st.success("✅ Loaded previous segmentation result")
-        imp_result, max_confidence_ML = st.session_state.seg_result
-        st.write("Result:", imp_result)
-        st.write("Max confidence (ML):", max_confidence_ML)
-    
-    else:
-        # -------------------------------
-        # Run seg_code with timeout
-        # -------------------------------
-        queue = multiprocessing.Queue()
-        p = multiprocessing.Process(
-            target=run_seg_code,
-            args=(queue, st.session_state.seg_inputs)
-        )
-    
-        with st.spinner(f"🔄 Running segmentation (attempt {st.session_state.retry_count + 1})..."):
-            p.start()
-            p.join(TIMEOUT)
-    
-        if p.is_alive():
-            p.terminate()
-            p.join()
-            st.warning(f"⚠️ seg_code took longer than {TIMEOUT} seconds (attempt {st.session_state.retry_count + 1}).")
-    
-            st.session_state.retry_count += 1
-    
-            if st.session_state.retry_count >= MAX_RETRIES:
-                st.error("❌ Max retries reached. Restarting whole app...")
-                st.session_state.clear()
-                st.rerun()
-            else:
-                st.rerun()
-    
-        else:
-            status, result = queue.get()
-            if status == "success":
-                st.session_state.seg_result = result  # ✅ Save for resume
-                st.session_state.retry_count = 0      # reset retries
-                imp_result, max_confidence_ML = result
+    with st.spinner("🔄 Running segmentation..."):
+        with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(seg_code, *inputs)
+            try:
+                imp_result, max_confidence_ML = future.result(timeout=TIMEOUT)
                 st.success("✅ Segmentation completed successfully!")
                 st.write("Result:", imp_result)
                 st.write("Max confidence (ML):", max_confidence_ML)
-            else:
-                st.warning(f"❌ seg_code failed with error: {result} (attempt {st.session_state.retry_count + 1}).")
-                st.session_state.retry_count += 1
     
-                if st.session_state.retry_count >= MAX_RETRIES:
-                    st.error("❌ Max retries reached. Restarting whole app...")
-                    st.session_state.clear()
-                    st.rerun()
-                else:
-                    st.rerun()
-           
-               
+            except concurrent.futures.TimeoutError:
+                st.error(f"❌ Seg_code took longer than {TIMEOUT} seconds!")
+                if predicted_value[0] == 1:
+                    imp_result = 'Non-Lung Cancer'
+                    max_confidence_ML = predicted_proba_DL
+                    shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
+                elif predicted_value[0] == 0:
+                    imp_result = 'Lung Cancer'
+                    max_confidence_ML = predicted_proba_DL
+                    shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
+    
+            except Exception as e:
+                st.error(f"❌ Seg_code failed: {e}")
+                if predicted_value[0] == 1:
+                    imp_result = 'Non-Lung Cancer'
+                    max_confidence_ML = predicted_proba_DL
+                    shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
+                elif predicted_value[0] == 0:
+                    imp_result = 'Lung Cancer'
+                    max_confidence_ML = predicted_proba_DL
+                    shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
                
     ##del results
     #del result
@@ -404,10 +359,3 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     plt.close('all')
     ################3
     return imp_result,max_confidence_ML
-
-
-
-
-
-
-
