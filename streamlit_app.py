@@ -1,4 +1,5 @@
 import os
+os.environ["STREAMLIT_WATCHDOG"] = "false"
 #os.environ["STREAMLIT_SERVER_RUN_ON_SAVE_TIMEOUT"] = "600"
 import streamlit as st
 import time
