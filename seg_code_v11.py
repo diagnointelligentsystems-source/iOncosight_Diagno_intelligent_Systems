@@ -1,5 +1,5 @@
     ########################## segmentation model
-def seg_code(img_p,yolov11,image_path,predicted_proba_DL,predicted_value,sel_ens_M1, sel_ens_M2, sel_ens_M3, scaled_ens_M1, scaled_ens_M2, scaled_ens_M3, ens_MCN):
+def seg_code(current_dir,img_p,yolov11,image_path,predicted_proba_DL,predicted_value,sel_ens_M1, sel_ens_M2, sel_ens_M3, scaled_ens_M1, scaled_ens_M2, scaled_ens_M3, ens_MCN):
     import os
     import sys
     import cv2
@@ -652,6 +652,7 @@ def seg_code(img_p,yolov11,image_path,predicted_proba_DL,predicted_value,sel_ens
     plt.close('all')
 
     return imp_result, max_confidence_ML
+
 
 
 
