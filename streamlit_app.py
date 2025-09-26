@@ -1245,23 +1245,6 @@ with col2:
         with col_b:
             if st.button("💾 Download", use_container_width=True):
                 report_text = f"""
-                # AI Medical Report
-                **Impression:** {st.session_state.report_data.get('impression', 'N/A')}
-                **Confidence:** {st.session_state.report_data['confidence']}
-                **Processing Time:** {st.session_state.report_data['processing_time']}
-                """
-                st.download_button("⬇️ Download Report", report_text, file_name="AI_Report.txt")
-        with col_c:
-            if st.button("🆕 New Analysis", use_container_width=True):
-                # reset state
-                st.session_state.completed = False
-                st.session_state.processed_result = None
-                st.session_state.report_data = None
-                st.session_state.uploaded_file = None
-                st.rerun()
-
-
-
 iOncoSight DIAGNOSTIC REPORT
 ============================
 
@@ -1294,12 +1277,14 @@ Report ID: {st.session_state.report_data['patient_id']}-{datetime.now().strftime
                     mime="text/plain",
                      width="stretch"
                 )
+
         with col_c:
             if st.button("🔄 New Analysis",  width="stretch"):
                 st.session_state.uploaded_file = None
                 st.session_state.processed_result = None
                 st.session_state.report_data = None
                 st.session_state.show_report = False
+                st.session_state.completed = False
                 st.rerun()
             else:
                 st.info("🎯 Upload an image and click 'Analyze Image' to begin new AI analysis")
