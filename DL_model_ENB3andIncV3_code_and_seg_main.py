@@ -346,7 +346,9 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     max_confidence_ML=predicted_proba_DL
     if (X_stack[0])[0]==0 and (X_stack[0])[2]==0:
         predicted_value[0]=0
-    if (X_stack[0])[0]==0 and (X_stack[0])[1]==0 and eff_pred[0]>=0.5 and inc_pred[0]>=0.5:
+    if (X_stack[0])[0] == 0 and (X_stack[0])[1] == 0 and eff_pred[0] >= 0.5 and inc_pred[0] >= 0.5:
+        predicted_value[0] = 0
+    if (X_stack[0])[1] == 0 and eff_pred[0] >= 0.5 and inc_pred[0] >= 0.5:
         predicted_value[0]=0
     print('predicted_value[0]',predicted_value[0])
     plt.close('all')
@@ -1046,4 +1048,5 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed', flush=True)
     ################3
     return imp_result,max_confidence_ML
+
 
