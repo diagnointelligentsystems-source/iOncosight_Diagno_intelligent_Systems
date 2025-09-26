@@ -307,8 +307,8 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     import seg_code_v11
     from seg_code_v11 import seg_code
     
-    TIMEOUT = 10   # seconds
-    MAX_RETRIES = 3
+    TIMEOUT = 15   # seconds
+    MAX_RETRIES = 1
     
     def run_seg_code(queue, params):
         """Worker process to run seg_code and return results via queue."""
@@ -404,6 +404,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     plt.close('all')
     ################3
     return imp_result,max_confidence_ML
+
 
 
 
