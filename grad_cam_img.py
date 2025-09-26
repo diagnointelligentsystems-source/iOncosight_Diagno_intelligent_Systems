@@ -1,4 +1,11 @@
 def grad_Cam_1(image_path,eff_model)
+    import os
+    import shutil               # for copying files
+    import cv2                  # OpenCV for image loading and processing
+    import numpy as np          # for array operations
+    import tensorflow as tf     # for GradientTape and model operations
+    from tensorflow import keras  # for image preprocessing (load_img, img_to_array)
+
     if 1==1:
         img = img_p = cv2.imread(image_path)
       
@@ -66,3 +73,4 @@ def grad_Cam_1(image_path,eff_model)
         #################
         # Copy image
     shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
+
