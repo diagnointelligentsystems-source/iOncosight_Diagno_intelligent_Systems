@@ -168,35 +168,6 @@ scaled_ens_M1 = load_scaler("1_scaler_ALL_FEATURE_5m_SCORE_rf_f_classif_BOTH__mi
 scaled_ens_M2 = load_scaler("2_scaler_ALL_FEATURE_5m_SCORE_rf_mutual_info_classif_BOTH__min_max_w_fec.pkl")
 scaled_ens_M3 = load_scaler("3_scaler_ALL_FEATURE_3_MCN_xgb_mutual_info_classif__min_max_K_{k}.pkl")
 
-def log_memory_usage(note=""):
-    process = psutil.Process(os.getpid())
-    mem = process.memory_info().rss / (1024 * 1024)  # in MB
-    st.write(f"🧠 Memory at {note}: {mem:.2f} MB")
-#Run inference
-log_memory_usage("start")  # ~50 MB
-big_list = [i for i in range(10**7)]
-log_memory_usage("after big_list")  # jumps to ~300 MB (real)      
-del big_list
-log_memory_usage("after deleting big_list") 
-
-
-# ✅ Track number of runs
-if "run_count" not in st.session_state:
-    st.session_state.run_count = 0
-
-st.session_state.run_count += 1
-#st.write(f"Run count: {st.session_state.run_count}")
-
-# ✅ Every 3 runs, clear temporary memory (not model)
-import gc, tensorflow as tf
-
-if st.session_state.run_count % 3 == 0:
-    st.cache_data.clear()
-    gc.collect()
-
-
-    st.write("🧹 Cleared temporary cache, garbage, and TF session")
-
 # ----------------------------
 # Optional: Check token
 # ----------------------------
@@ -1320,8 +1291,8 @@ with col2:
         st.session_state.report_data = AIAnalysisEngine.generate_realistic_report(Patient_ID, Predicted_class_ML,
                                                                                   impression, max_confidence_ML,
                                                                                   Risk_level, processing_time)
-        #SessionManager.update_stats()
-        #st.rerun()
+        SessionManager.update_stats()
+        st.rerun()
 
     elif st.session_state.processed_result:
         # Enhanced results display
