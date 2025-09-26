@@ -142,6 +142,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ### grade cam
     if 1==1:
         img = img_p = cv2.imread(image_path)
+      
         ###
         # ---- Grad-CAM Function ----
         def get_gradcam(model, img_array, last_conv_layer_name, pred_index=None):
@@ -182,8 +183,17 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         def preprocess_image_g(img_path, target_size=(300, 300)):
             img = keras.preprocessing.image.load_img(img_path, target_size=target_size)
             img_array = keras.preprocessing.image.img_to_array(img)
+            
+            # Ensure 3 channels
+            if img_array.shape[-1] == 1:
+                img_array = np.repeat(img_array, 3, axis=-1)
+            
+            # Add batch dimension
             img_array = np.expand_dims(img_array, axis=0)
-            img_array = img_array / 255.0  # normalize
+            
+            # Normalize and convert to float32
+            img_array = img_array / 255.0
+            img_array = img_array.astype(np.float32)
             return img, img_array
 
 
@@ -1048,6 +1058,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed', flush=True)
     ################3
     return imp_result,max_confidence_ML
+
 
 
 
