@@ -176,64 +176,7 @@ try:
     st.write("Logged in as:", user_info["name"])
 except Exception as e:
     st.error(f"Token is invalid or missing: {e}")
-########### efficientnetb3 and inceptionv3 model
-# @st.cache_resource
-# def load_eff_model():
-#     file_id = "14Nv2fGaPe97Qrik6cWPGaa5npcScDLhw"
-#     url = f"https://drive.google.com/uc?id={file_id}"
-#     output = "model.keras"
-#     if not os.path.exists(output):  # download only if missing
-#         with st.spinner("Downloading EfficientNetB3 model..."):
-#             gdown.download(url, output, quiet=False)
-#     return keras.models.load_model(output, compile=False)
-#
-# @st.cache_resource
-# def load_inc_model():
-#     file_id = "1uDY-p3KYFimHFhUlnhGL9z3B1Wy9EvxV"
-#     url = f"https://drive.google.com/uc?id={file_id}"
-#     output = "inceptionv3_model.keras"
-#     if not os.path.exists(output):  # download only if missing
-#         with st.spinner("Downloading InceptionV3 model..."):
-#             gdown.download(url, output, quiet=False)
-#     return keras.models.load_model(output, compile=False)
-# eff_model = load_eff_model()
-# inc_model = load_inc_model()
-# #################  load ML model
-# import joblib  # for loading .pkl models
-# #https://drive.google.com/file/d/1mveJZtayAeR6ZjrF_ZT_2r1BrA2moE9C/view?usp=sharing
-# @st.cache_resource
-# def load_rf_model_1():
-#     file_id = "1mveJZtayAeR6ZjrF_ZT_2r1BrA2moE9C"
-#     output = "lbm_BOTH_rf_model1.pkl"
-#     url = f"https://drive.google.com/uc?id={file_id}"
-#     if not os.path.exists(output):  # only download once
-#         with st.spinner("Downloading RF/SVM model 1..."):
-#             gdown.download(url, output, quiet=False)
-#     st.write("Model 1 file size:", os.path.getsize(output), "bytes")
-#     return joblib.load(output)
-# #https://drive.google.com/file/d/1qSABFiDp4pAO2bVv-vc-E8GVrmyAGX3_/view?usp=sharing
-# @st.cache_resource
-# def load_rf_model_2():
-#     file_id = "1qSABFiDp4pAO2bVv-vc-E8GVrmyAGX3_"
-#     output = "lbm_BOTH_rf_model_v21.pkl"
-#     url = f"https://drive.google.com/uc?id={file_id}"
-#     if not os.path.exists(output):  # only download once
-#         with st.spinner("Downloading RF/SVM model 2..."):
-#             gdown.download(url, output, quiet=False)
-#     st.write("Model 2 file size:", os.path.getsize(output), "bytes")
-#     return joblib.load(output)
-#
-# # Load models once, cached
-# rf_model_1 = load_rf_model_1()
-# rf_model_2 = load_rf_model_2()
-
-
-
 # Load models (cached, won’t redownload on each rerun)
-
-
-
-
 
 try:
     import pydicom
@@ -1120,46 +1063,37 @@ st.markdown("""
 
 col1, col2 = st.columns([1, 1], gap="large")
 
+if "processing" not in st.session_state:
+    st.session_state.processing = False
+if "processed_result" not in st.session_state:
+    st.session_state.processed_result = None
+if "completed" not in st.session_state:
+    st.session_state.completed = False
+
 with col1:
-    # st.markdown('<div class="upload-section">', unsafe_allow_html=True)
     st.subheader("📤 Upload X-ray Image")
 
-    # Enhanced file uploader with better help text
     uploaded_file = st.file_uploader(
         "Choose a DICOM file",
-        type=['dcm','dicom','png','jpg','jpeg','tif','bmp'],
-        help="📁 Supported formats: DICOM (.dcm,.dicom')"
+        type=['dcm', 'dicom', 'png', 'jpg', 'jpeg', 'tif', 'bmp'],
+        help="📁 Supported formats: DICOM (.dcm,.dicom)",
+        disabled=st.session_state.completed or st.session_state.processing
     )
 
     if uploaded_file is not None:
         st.session_state.uploaded_file = uploaded_file
-
-        # Display uploaded image with enhanced styling
         try:
             image, dicom_data = ImageProcessor.load_image(uploaded_file)
             if image:
-                # Create image container with better styling
-                # st.markdown('<div class="image-container">', unsafe_allow_html=True)
-                st.image(image, caption="📷 Uploaded Medical Image",  width="stretch")
-                st.markdown('</div>', unsafe_allow_html=True)
+                st.image(image, caption="📷 Uploaded Medical Image", width="stretch")
             else:
-                st.error("❌ Failed to load the uploaded image. Please check the file format.")
-
+                st.error("❌ Failed to load the uploaded image.")
         except Exception as e:
-            st.markdown(f"""
-                <div class="status-error">
-                    ❌ Error processing image: {str(e)}
-                    <br><br>
-                    <strong>Troubleshooting tips:</strong>
-                    <ul>
-                        <li>For DICOM files: Ensure the file is not corrupted</li>
-                        <li>For standard images: Try converting to PNG or JPEG format</li>
-                        <li>Check if the file size is under 25MB</li>
-                    </ul>
-                </div>
-                """, unsafe_allow_html=True)
+            st.error(f"❌ Error processing image: {e}")
 
-    if st.button("🔍 Analyze Image", disabled=(uploaded_file is None),  width="stretch"):
+    if st.button("🔍 Analyze Image",
+                 disabled=(uploaded_file is None) or st.session_state.completed,
+                 use_container_width=True):
         st.session_state.processing = True
         st.rerun()
 with col2:
@@ -1176,23 +1110,6 @@ with col2:
 
         progress_bar = st.progress(0)
         status_text = st.empty()
-
-        processing_steps = [
-            "🔄 Initializing AI models...",
-            "📸 Preprocessing image data...",
-            "🧠 Running deep learning analysis...",
-            "🔍 Detecting anatomical structures...",
-            "⚕️ Applying medical algorithms...",
-            "📋 Generating diagnostic report...",
-            "✅ Finalizing results..."
-        ]
-
-        for i in range(100):
-            progress_bar.progress(i + 1)
-            step_index = min(i // 15, len(processing_steps) - 1)
-            status_text.text(processing_steps[step_index])
-            time.sleep(0.04)
-
         ##############################################################################
         import os
 
@@ -1287,49 +1204,62 @@ with col2:
 
         # Simulate processing completion with enhanced results
         st.session_state.processing = False
+        st.session_state.completed = True
         st.session_state.processed_result = "result.jpg"
-        st.session_state.report_data = AIAnalysisEngine.generate_realistic_report(Patient_ID, Predicted_class_ML,
-                                                                                  impression, max_confidence_ML,
-                                                                                  Risk_level, processing_time)
+        st.session_state.report_data = AIAnalysisEngine.generate_realistic_report(
+            Patient_ID, Predicted_class_ML, impression, max_confidence_ML,
+            Risk_level, processing_time
+        )
         SessionManager.update_stats()
         st.rerun()
 
     elif st.session_state.processed_result:
-        # Enhanced results display
-        st.markdown("""
-            <div class="status-succes
-                ✅ Analysis completed successfully!
-            </div>
-            """, unsafe_allow_html=True)
+        st.success("✅ Analysis completed successfully!")
 
-        # Display enhanced result with better placeholder
-        # st.markdown('<div class="image-container">', unsafe_allow_html=True)
-        # img = Image.open("result.jpg")
-        st.image("result.jpg", caption="🤖 AI Analysis Visualization",  width="stretch")
-        # st.image("result.jpg",
-        # caption="🤖 AI Analysis Visualization",  width="stretch")
-        st.markdown('</div>', unsafe_allow_html=True)
+        # Display result image
+        st.image("result.jpg", caption="🤖 AI Analysis Visualization", width="stretch")
 
-        # Enhanced metrics display
+        # Display metrics
         if st.session_state.report_data:
             col_m1, col_m2 = st.columns(2)
             with col_m1:
-                st.metric("🎯 Confidence", st.session_state.report_data['confidence'],
-                          delta="High" if float(
-                              st.session_state.report_data['confidence'].rstrip('%')) > 95 else "Good")
+                st.metric(
+                    "🎯 Confidence",
+                    st.session_state.report_data['confidence'],
+                    delta="High" if float(
+                        st.session_state.report_data['confidence'].rstrip('%')
+                    ) > 95 else "Good"
+                )
             with col_m2:
-                st.metric("⚡ Processing Time", st.session_state.report_data['processing_time'],
-                          delta="Fast")
+                st.metric(
+                    "⚡ Processing Time",
+                    st.session_state.report_data['processing_time'],
+                    delta="Fast"
+                )
 
-        # Enhanced action buttons
+        # Action buttons
         col_a, col_b, col_c = st.columns([1, 1, 1])
         with col_a:
-            if st.button("📋 View Report",  width="stretch"):
+            if st.button("📋 View Report", use_container_width=True):
                 st.session_state.show_report = True
         with col_b:
-            if st.button("💾 Download",  width="stretch"):
-                # Enhanced report generation
+            if st.button("💾 Download", use_container_width=True):
                 report_text = f"""
+                # AI Medical Report
+                **Impression:** {st.session_state.report_data.get('impression', 'N/A')}
+                **Confidence:** {st.session_state.report_data['confidence']}
+                **Processing Time:** {st.session_state.report_data['processing_time']}
+                """
+                st.download_button("⬇️ Download Report", report_text, file_name="AI_Report.txt")
+        with col_c:
+            if st.button("🆕 New Analysis", use_container_width=True):
+                # reset state
+                st.session_state.completed = False
+                st.session_state.processed_result = None
+                st.session_state.report_data = None
+                st.session_state.uploaded_file = None
+                st.rerun()
+
 
 
 iOncoSight DIAGNOSTIC REPORT
