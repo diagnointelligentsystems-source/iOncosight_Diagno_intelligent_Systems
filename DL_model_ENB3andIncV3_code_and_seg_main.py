@@ -61,9 +61,9 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     file_path = os.path.join(current_dir, file_path)
     if os.path.exists(file_path):
         os.remove(file_path)
-        print(f"Deleted: {os.path.exists(file_path)}")
-    else:
-        print("File does not exist.")
+        print(f"Deleted: {os.path.exists(file_path)}", flush=True)
+    #else:
+     #   print("File does not exist.")
     # Preprocessing
     # ================================
     def preprocess_image(img_path, img_size):
@@ -131,9 +131,9 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         eff_layer_index=-2,   # adjust if needed
         inc_layer_index=-2    # adjust if needed
     )
-    print ('#****************************************')
-    print('efficientNetB3', eff_pred, 'InceptionV3', inc_pred)
-    print( '# ****************************************')
+    print ('#****************************************', flush=True)
+    print('efficientNetB3', eff_pred, 'InceptionV3', inc_pred, flush=True)
+    print( '# ****************************************', flush=True)
 
     
     #print(features_df.head())
@@ -328,12 +328,12 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 
     # Combine predictions into a feature matrix
     X_stack = np.column_stack((preds_model1, preds_model2, preds_model3))
-    print('X_stack ',X_stack )
+    print('X_stack ',X_stack , flush=True)
     # Load the saved stacked ensemble model from the file
     loaded_model = st_ens_LC_NR #joblib.load()#'./Ensemble_model/stacked_ensemble_model_ML_LCmass_others.pkl')
     predicted_value = loaded_model.predict(X_stack)
 
-    print('st_predicted_value',predicted_value)
+    print('st_predicted_value',predicted_value, flush=True)
     # Get probability scores
     proba_scores = loaded_model.predict_proba(X_stack)
 
@@ -342,7 +342,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     max_confidence =  np.max(proba_scores, axis=1)  # take highest probability
     predicted_proba_DL = (np.round(max_confidence * 100, 2))[0]
 
-    print("Probability scores:", predicted_proba_DL)
+    print("Probability scores:", predicted_proba_DL, flush=True)
     max_confidence_ML=predicted_proba_DL
     if (X_stack[0])[0]==0 and (X_stack[0])[2]==0:
         predicted_value[0]=0
@@ -350,9 +350,9 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         predicted_value[0] = 0
     if (X_stack[0])[1] == 0 and eff_pred[0] >= 0.5 and inc_pred[0] >= 0.5:
         predicted_value[0]=0
-    print('predicted_value[0]',predicted_value[0])
+    print('predicted_value[0]',predicted_value[0], flush=True)
     plt.close('all')
-    print('ex 1')
+    print('ex 1', flush=True)
     #### delecting un used data
    #delloaded_SVM_model
     #del eff_model,inc_model
@@ -361,7 +361,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ########################## segmentation model
     output_path = "./images_YOLOV11/V11_input.png"
     try: #if 1==1:#predicted_value[0]!=1:
-        print('ex 1_1')
+        print('ex 1_1', flush=True)
         from PIL import Image
         # Load best model
         # Class mapping
@@ -378,7 +378,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
         results=[]
         # Load best model
         cwd = os.getcwd()
-        print("Current working directory:", cwd)
+        #print("Current working directory:", cwd)
         # Set directory
         #from ultralytics import YOLO
         model = yolov11 #YOLO(yolov11)#"./yolov11_seg_MCN_best.pt")
@@ -391,19 +391,19 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 
         # Copy image
         shutil.copy(image_path, output_path)
-        print('ex 1_2')
+        print('ex 1_2', flush=True)
         output_path = "./output_YOLOV11/V11_SEG_PRED.png"
-        print('ex 1_2_1')
+        print('ex 1_2_1', flush=True)
         # Run inference
         img_samp = cv2.imread(image_path)
-        print('image_path :',image_path)
-        print("img_samp shape:", img_samp.shape)
+        print('image_path :',image_path, flush=True)
+        print("img_samp shape:", img_samp.shape, flush=True)
       # Run inference
         def log_memory(stage=""):
             import psutil
             process = psutil.Process(os.getpid())
             rss = process.memory_info().rss / (1024 ** 2)
-            print(f"[{stage}] RSS memory: {rss:.2f} MB")
+            print(f"[{stage}] RSS memory: {rss:.2f} MB", flush=True)
         
         # -------------------- Feature extraction hook --------------------
         features_dict = {}
@@ -413,7 +413,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
                     pooled = torch.mean(output[0], dim=(1, 2))
                     features_dict['feat'] = pooled.detach().cpu().numpy()
                 model.model.model[layer_idx].register_forward_hook(hook_fn)
-                print("✅ Feature hook registered")
+                print("✅ Feature hook registered", flush=True)
             except Exception as e:
                 print(f"❌ Failed to register hook: {e}")
         
@@ -469,7 +469,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 
         # ---------- Run inference ----------
         results = model(image_path, conf=0.2, iou=0.5, imgsz=512, device="cpu")
-        print("Raw results:", results, flush=True)
+        #print("Raw results:", results, flush=True)
         print("Results length:", len(results), flush=True)
 
         result = None
@@ -1048,6 +1048,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     print('ex 9','Analysis completed', flush=True)
     ################3
     return imp_result,max_confidence_ML
+
 
 
 
