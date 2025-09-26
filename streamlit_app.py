@@ -29,6 +29,9 @@ import os
 from huggingface_hub import hf_hub_download, whoami
 import joblib
 from ultralytics import YOLO
+from datetime import datetime
+now = datetime.now()
+print(now)                           # full date & time
 import ultralytics
 print(ultralytics.__version__ , flush=True)
 import gc
