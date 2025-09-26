@@ -1,4 +1,4 @@
-def grad_Cam_1(image_path,eff_model)
+def grad_Cam_1(image_path,eff_model):
     import os
     import shutil               # for copying files
     import cv2                  # OpenCV for image loading and processing
@@ -73,4 +73,5 @@ def grad_Cam_1(image_path,eff_model)
         #################
         # Copy image
     shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
+
 
