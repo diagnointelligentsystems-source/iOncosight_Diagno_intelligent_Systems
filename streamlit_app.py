@@ -2,7 +2,10 @@ import os
 os.environ["STREAMLIT_WATCHDOG"] = "false"
 #os.environ["STREAMLIT_SERVER_RUN_ON_SAVE_TIMEOUT"] = "600"
 import streamlit as st
-st.session_state.clear()
+# Clear session state only once when a new user starts
+if "initialized" not in st.session_state:
+    st.session_state.clear()   # remove any old states
+    st.session_state.initialized = True
 import time
 from datetime import datetime
 from PIL import Image
@@ -1286,6 +1289,7 @@ Report ID: {st.session_state.report_data['patient_id']}-{datetime.now().strftime
                 st.session_state.report_data = None
                 st.session_state.show_report = False
                 st.session_state.completed = False
+                st.session_state.clear() 
                 st.rerun()
             else:
                 st.info("🎯 Upload an image and click 'Analyze Image' to begin new AI analysis")
