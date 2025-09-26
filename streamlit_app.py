@@ -1320,8 +1320,8 @@ with col2:
         st.session_state.report_data = AIAnalysisEngine.generate_realistic_report(Patient_ID, Predicted_class_ML,
                                                                                   impression, max_confidence_ML,
                                                                                   Risk_level, processing_time)
-        SessionManager.update_stats()
-        st.rerun()
+        #SessionManager.update_stats()
+        #st.rerun()
 
     elif st.session_state.processed_result:
         # Enhanced results display
