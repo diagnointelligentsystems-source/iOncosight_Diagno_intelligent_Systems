@@ -73,6 +73,8 @@ def grad_Cam_1(image_path,img_path,eff_model):
         #################
         # Copy image
     shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
+    return img_p
+
 
 
 
