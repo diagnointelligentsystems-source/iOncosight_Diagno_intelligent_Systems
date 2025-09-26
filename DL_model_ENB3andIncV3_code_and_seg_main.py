@@ -142,7 +142,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ### grade cam
     import grad_cam_img
     from grad_cam_img import grad_Cam_1
-    grad_Cam_1(image_path,eff_model)
+    grad_Cam_1(image_path,img_path,eff_model)
         #############    ML model
 
     # Load data
@@ -315,3 +315,4 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     plt.close('all')
     ################3
     return imp_result,max_confidence_ML
+
