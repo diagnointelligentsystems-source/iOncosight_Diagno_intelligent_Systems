@@ -10,6 +10,7 @@ if "initialized" not in st.session_state:
     st.session_state.show_report = False
     st.session_state.completed = False
     st.session_state.initialized = True
+ 
 import time
 from datetime import datetime
 from PIL import Image
@@ -31,12 +32,39 @@ import ultralytics
 print(ultralytics.__version__ , flush=True)
 import gc
 import psutil
+import sys
+import threading
 # ----------------------------
 # Set Hugging Face token safely
 # ----------------------------
 hf_token = st.secrets["HF_TOKEN"]
 os.environ["HUGGINGFACE_HUB_TOKEN"] = hf_token
+##############
+# ---------- Configuration ----------
+MEMORY_THRESHOLD = 0.8  # 80%
+CHECK_INTERVAL = 1      # seconds
 
+def monitor_memory():
+    """Background thread to monitor memory usage and restart the app if needed."""
+    while True:
+        mem = psutil.virtual_memory()
+        mem_used_percent = mem.percent / 100
+        
+        if mem_used_percent > MEMORY_THRESHOLD:
+            # Display warning (optional)
+            print(f"⚠️ Memory usage too high ({mem.percent}%). Restarting Streamlit app...")
+            
+            # Restart the Streamlit script
+            os.execv(sys.executable, [sys.executable] + sys.argv)
+        
+        time.sleep(CHECK_INTERVAL)
+
+# ---------- Start memory monitoring in background ----------
+if "memory_monitor_started" not in st.session_state:
+    thread = threading.Thread(target=monitor_memory, daemon=True)
+    thread.start()
+    st.session_state.memory_monitor_started = True
+ 
 # ----------------------------
 # Deep Learning Models
 # ----------------------------
