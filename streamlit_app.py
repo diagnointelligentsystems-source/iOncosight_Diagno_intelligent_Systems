@@ -41,27 +41,33 @@ hf_token = st.secrets["HF_TOKEN"]
 os.environ["HUGGINGFACE_HUB_TOKEN"] = hf_token
 ##############
 import streamlit as st
-import psutil, os
+import psutil, os, threading, time
 
 MEMORY_LIMIT_MB = 3072  # ~0.8 GB for Streamlit Cloud
 
-def check_app_memory():
-    process = psutil.Process(os.getpid())
-    mem_mb = process.memory_info().rss / (1024 ** 2)
-    st.sidebar.metric("App Memory Usage (MB)", f"{mem_mb:.2f}")
-    print("App Memory Usage (MB)", f"{mem_mb:.2f}")
+def monitor_memory():
+    while True:
+        process = psutil.Process(os.getpid())
+        mem_mb = process.memory_info().rss / (1024 ** 2)
+        st.session_state.app_memory = mem_mb
+        if mem_mb > MEMORY_LIMIT_MB:
+            st.warning(f"⚠️ App memory too high ({mem_mb:.2f} MB). Resetting...")
+            print(f"⚠️ App memory too high ({mem_mb:.2f} MB)
+            for key in ["uploaded_file", "processed_result", "report_data", 
+                        "show_report", "completed"]:
+                if key in st.session_state:
+                    del st.session_state[key]
+            st.experimental_rerun()  # rerun script if memory too high
+        time.sleep(1)  # check every 1 second
 
-    if mem_mb > MEMORY_LIMIT_MB:
-        st.warning(f"⚠️ App memory too high ({mem_mb:.2f} MB). Resetting session...")
-        # Clear relevant session state
-        for key in ["uploaded_file", "processed_result", "report_data", 
-                    "show_report", "completed"]:
-            if key in st.session_state:
-                del st.session_state[key]
-        st.experimental_rerun()  # safe rerun in Streamlit
+# Start background memory monitor once
+if "memory_monitor_started" not in st.session_state:
+    thread = threading.Thread(target=monitor_memory, daemon=True)
+    thread.start()
+    st.session_state.memory_monitor_started = True
 
-# Call this at the top of your script
-check_app_memory()
+# Display live memory in sidebar
+st.sidebar.metric("App Memory Usage (MB)", f"{st.session_state.get('app_memory', 0):.2f}")
 
  
 # ----------------------------
