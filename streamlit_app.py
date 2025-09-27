@@ -43,7 +43,7 @@ os.environ["HUGGINGFACE_HUB_TOKEN"] = hf_token
 import streamlit as st
 import psutil, os
 
-MEMORY_LIMIT_MB = 800  # ~0.8 GB for Streamlit Cloud
+MEMORY_LIMIT_MB = 3072  # ~0.8 GB for Streamlit Cloud
 
 def check_app_memory():
     process = psutil.Process(os.getpid())
