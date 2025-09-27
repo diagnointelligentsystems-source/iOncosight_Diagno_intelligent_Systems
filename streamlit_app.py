@@ -40,42 +40,7 @@ import threading
 hf_token = st.secrets["HF_TOKEN"]
 os.environ["HUGGINGFACE_HUB_TOKEN"] = hf_token
 ##############
-import streamlit as st
-import psutil, os, threading, time
-from streamlit_autorefresh import st_autorefresh
 
-MEMORY_LIMIT_MB = 3072  # 3GB
-CHECK_INTERVAL = 2      # seconds
-
-# auto refresh page every 2s
-st_autorefresh(interval=2000, key="refresh_memory")
-
-# ------------------ memory monitor thread ------------------
-def monitor_memory():
-    process = psutil.Process(os.getpid())
-    while True:
-        mem_mb = process.memory_info().rss / (1024 ** 2)
-        st.session_state["app_memory"] = mem_mb
-        st.session_state["memory_exceeded"] = mem_mb > MEMORY_LIMIT_MB
-        time.sleep(CHECK_INTERVAL)
-
-if "memory_monitor_started" not in st.session_state:
-    thread = threading.Thread(target=monitor_memory, daemon=True)
-    thread.start()
-    st.session_state.memory_monitor_started = True
-    st.session_state.app_memory = 0
-    st.session_state.memory_exceeded = False
-
-# ------------------ main UI ------------------
-st.sidebar.metric("App Memory Usage (MB)", f"{st.session_state.get('app_memory',0):.2f}")
-
-if st.session_state.get("memory_exceeded", False):
-    st.warning(f"⚠️ App memory too high ({st.session_state['app_memory']:.2f} MB). Resetting session...")
-    for key in ["uploaded_file","processed_result","report_data","show_report","completed"]:
-        if key in st.session_state:
-            del st.session_state[key]
-    st.session_state["memory_exceeded"] = False
-    st.experimental_rerun()
 
 
  
