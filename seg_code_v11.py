@@ -65,25 +65,32 @@ def seg_code(current_dir,img_p,yolov11,image_path,predicted_proba_DL,predicted_v
 
         print(f"✅ orig img shape: {img.shape}", flush=True)
 
-        # ---------- Setup hook for feature extraction ----------
-        features_dict = {}
-
-        def hook_fn(module, input, output):
-            pooled = torch.mean(output[0], dim=(1, 2))  # Global Average Pooling
-            features_dict['feat'] = pooled.detach().cpu().numpy()
-
-        try:
-            hook = model.model.model[10].register_forward_hook(hook_fn)
-            print("✅ Hook registered", flush=True)
-        except Exception as e:
-            print(f"❌ Failed to register hook: {e}", flush=True)
-            hook = None
-
-        # ---------- Run inference ----------
+       # ---------- Setup cached model + hook ----------
+        @st.cache_resource
+        def load_model(yolov11_model):
+            features_dict = {}
+        
+            def hook_fn(module, input, output):
+                pooled = torch.mean(output[0], dim=(1, 2))  # Global Average Pooling
+                features_dict['feat'] = pooled.detach().cpu().numpy()
+        
+            # Register hook once
+            yolov11_model.model.model[10].register_forward_hook(hook_fn)
+        
+            return yolov11_model, features_dict
+        
+        
+        # ---------- Load cached model + hook ----------
+        model, features_dict = load_model(yolov11)  # yolov11 = preloaded YOLOv11 object
+        
+        # ---------- Run inference per user ----------
         results = model(image_path, conf=0.2, iou=0.5, imgsz=512, device="cpu")
-        #print("Raw results:", results, flush=True)
         print("Results length:", len(results), flush=True)
-
+        
+        # ---------- Extract features safely per user ----------
+        feat = features_dict.get('feat', None)
+        if feat is not None:
+            feat = feat.copy()  # ✅ per-user copy, safe for multi-user Streamlit
         result = None
         if results and len(results) > 0:
             result = results[0]
@@ -107,7 +114,6 @@ def seg_code(current_dir,img_p,yolov11,image_path,predicted_proba_DL,predicted_v
             print("⚠️ No detections returned", flush=True)
 
         # ---------- Feature extraction ----------
-        feat = features_dict.get('feat', None)
         ens_ML_MCN_output = 60
         conf_ML = predicted_proba_DL  # comes from earlier context
 
@@ -652,6 +658,7 @@ def seg_code(current_dir,img_p,yolov11,image_path,predicted_proba_DL,predicted_v
     plt.close('all')
 
     return imp_result, max_confidence_ML
+
 
 
 
