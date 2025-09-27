@@ -276,4 +276,5 @@ def DL_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,en
 
     plt.close('all')
     ################3
-    return predicted_proba_DL,predicted_value,img_path,image_path
+    return predicted_proba_DL,predicted_value,img_path,image_path,current_dir,img_p
+
