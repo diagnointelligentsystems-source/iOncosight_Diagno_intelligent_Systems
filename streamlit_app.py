@@ -52,7 +52,7 @@ def monitor_memory():
         st.session_state.app_memory = mem_mb
         if mem_mb > MEMORY_LIMIT_MB:
             st.warning(f"⚠️ App memory too high ({mem_mb:.2f} MB). Resetting...")
-            print(f"⚠️ App memory too high ({mem_mb:.2f} MB))
+            print(f"⚠️ App memory too high ({mem_mb:.2f} MB)")
             for key in ["uploaded_file", "processed_result", "report_data", 
                         "show_report", "completed"]:
                 if key in st.session_state:
