@@ -1,7 +1,7 @@
 import os
 os.environ["STREAMLIT_WATCHDOG"] = "false"
 import streamlit as st
-
+ 
 # Clear any old states at the very start
 if "initialized" not in st.session_state:
     st.session_state.uploaded_file = None
