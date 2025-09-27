@@ -66,6 +66,7 @@ def seg_code(current_dir,img_p,yolov11,image_path,predicted_proba_DL,predicted_v
         print(f"✅ orig img shape: {img.shape}", flush=True)
 
        # ---------- Setup cached model + hook ----------
+        import streamlit as st
         @st.cache_resource
         def load_model(yolov11_model):
             features_dict = {}
@@ -658,6 +659,7 @@ def seg_code(current_dir,img_p,yolov11,image_path,predicted_proba_DL,predicted_v
     plt.close('all')
 
     return imp_result, max_confidence_ML
+
 
 
 
