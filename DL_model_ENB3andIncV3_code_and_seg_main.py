@@ -50,7 +50,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     ###  DL model
     import DL_code_full
     from DL_code_full import DL_code
-    predicted_proba_DL,predicted_value,img_path,image_path=DL_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,ens_scaler_rf_chi2,ens_scaler_xgb_chi2,ens_scaler_rf_mi,st_ens_LC_NR)
+    predicted_proba_DL,predicted_value,img_path,image_path,current_dir,img_p=DL_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,ens_scaler_rf_chi2,ens_scaler_xgb_chi2,ens_scaler_rf_mi,st_ens_LC_NR)
     #############   Segmentation
     import seg_code_v11
     from seg_code_v11 import seg_code
@@ -114,4 +114,5 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 ##                    max_confidence_ML = predicted_proba_DL
 ##                    shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
                
+
 
