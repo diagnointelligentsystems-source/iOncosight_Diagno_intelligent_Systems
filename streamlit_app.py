@@ -42,35 +42,35 @@ os.environ["HUGGINGFACE_HUB_TOKEN"] = hf_token
 ##############
 import streamlit as st
 import psutil, os, threading, time
+from streamlit_autorefresh import st_autorefresh  # pip install streamlit-autorefresh
 
 MEMORY_LIMIT_MB = 3072  # 3GB
 CHECK_INTERVAL = 2      # seconds
+
+# Auto-refresh page every 2 seconds
+st_autorefresh(interval=2000, key="memory_refresh")
 
 # -------------------- Background memory monitor --------------------
 def monitor_memory():
     process = psutil.Process(os.getpid())
     while True:
         mem_mb = process.memory_info().rss / (1024 ** 2)
-        # Update session state (thread-safe)
         st.session_state["app_memory"] = mem_mb
-        if mem_mb > MEMORY_LIMIT_MB:
-            st.session_state["memory_exceeded"] = True
-            print(f"⚠️ App memory too high ({mem_mb:.2f} MB)! Resetting session...", flush=True)
+        st.session_state["memory_exceeded"] = mem_mb > MEMORY_LIMIT_MB
         time.sleep(CHECK_INTERVAL)
 
-# Start the memory monitor thread once
+# Start memory monitor thread once
 if "memory_monitor_started" not in st.session_state:
     thread = threading.Thread(target=monitor_memory, daemon=True)
     thread.start()
     st.session_state.memory_monitor_started = True
-    st.session_state.memory_exceeded = False
     st.session_state.app_memory = 0
+    st.session_state.memory_exceeded = False
 
-# -------------------- Main script --------------------
-# Display live memory in sidebar
+# -------------------- Display memory --------------------
 st.sidebar.metric("App Memory Usage (MB)", f"{st.session_state.get('app_memory', 0):.2f}")
 
-# If memory limit exceeded, reset the session safely
+# -------------------- Check memory limit --------------------
 if st.session_state.get("memory_exceeded", False):
     st.warning(f"⚠️ App memory too high ({st.session_state['app_memory']:.2f} MB). Resetting session...")
     for key in ["uploaded_file", "processed_result", "report_data", "show_report", "completed"]:
@@ -78,16 +78,6 @@ if st.session_state.get("memory_exceeded", False):
             del st.session_state[key]
     st.session_state["memory_exceeded"] = False
     st.experimental_rerun()
-
-# -------------------- Example usage --------------------
-st.title("Memory Monitor Test")
-st.write("Upload and process images here...")
-
-# Example: dummy memory usage
-if st.button("Allocate Memory"):
-    import numpy as np
-    arr = np.random.rand(5000, 5000)  # Allocate memory to test
-    st.write("Memory allocated!")
 
 
  
