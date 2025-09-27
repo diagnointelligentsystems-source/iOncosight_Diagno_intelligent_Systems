@@ -49,6 +49,7 @@ def check_app_memory():
     process = psutil.Process(os.getpid())
     mem_mb = process.memory_info().rss / (1024 ** 2)
     st.sidebar.metric("App Memory Usage (MB)", f"{mem_mb:.2f}")
+    print("App Memory Usage (MB)", f"{mem_mb:.2f}")
 
     if mem_mb > MEMORY_LIMIT_MB:
         st.warning(f"⚠️ App memory too high ({mem_mb:.2f} MB). Resetting session...")
