@@ -60,7 +60,7 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
     #delmodel
     #del df
     #delimg, img1
-    gc.collect()
+    #gc.collect()
     print('imp_result',imp_result,'max_confidence_ML',max_confidence_ML, flush=True)
     print('ex 9','Analysis completed', flush=True)
     plt.close('all')
@@ -114,5 +114,6 @@ def full_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,
 ##                    max_confidence_ML = predicted_proba_DL
 ##                    shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
                
+
 
 
