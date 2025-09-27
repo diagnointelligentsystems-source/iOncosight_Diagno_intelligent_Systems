@@ -113,6 +113,10 @@ def DL_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,en
         df.insert(1, "label", dummy_label)
 
         #print(f"✅ Extracted EfficientNet layer: {eff_layer}, Inception layer: {inc_layer}")
+        import gc
+        del eff_features, inc_features
+        gc.collect()
+        tf.keras.backend.clear_session()
         return df,img_eff,eff_pred,inc_pred
 
     # ================================
@@ -126,12 +130,7 @@ def DL_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,en
     )
     print ('#****************************************', flush=True)
     print('efficientNetB3', eff_pred, 'InceptionV3', inc_pred, flush=True)
-    print( '# ****************************************', flush=True)
-    import gc
-    del eff_features, inc_features
-    gc.collect()
-    tf.keras.backend.clear_session()
-    
+    print( '# ****************************************', flush=True)   
     #print(features_df.head())
     features_df.to_csv("./DL_model_ENB3andIncV3/combined_conv_features.csv", index=False)
     #print('saved')
@@ -299,6 +298,7 @@ def DL_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,en
     plt.close('all')
     ################3
     return predicted_proba_DL,predicted_value,img_path,image_path,current_dir,img_p
+
 
 
 
