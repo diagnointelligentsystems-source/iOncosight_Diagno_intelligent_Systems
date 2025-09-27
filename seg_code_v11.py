@@ -68,18 +68,15 @@ def seg_code(current_dir,img_p,yolov11,image_path,predicted_proba_DL,predicted_v
        # ---------- Setup cached model + hook ----------
         import streamlit as st
         @st.cache_resource
-        def load_model(yolov11_model):
+        def load_model(_yolov11_model):
             features_dict = {}
         
             def hook_fn(module, input, output):
-                pooled = torch.mean(output[0], dim=(1, 2))  # Global Average Pooling
+                pooled = torch.mean(output[0], dim=(1, 2))
                 features_dict['feat'] = pooled.detach().cpu().numpy()
         
-            # Register hook once
-            yolov11_model.model.model[10].register_forward_hook(hook_fn)
-        
-            return yolov11_model, features_dict
-        
+            _yolov11_model.model.model[10].register_forward_hook(hook_fn)
+            return _yolov11_model, features_dict     
         
         # ---------- Load cached model + hook ----------
         model, features_dict = load_model(yolov11)  # yolov11 = preloaded YOLOv11 object
@@ -659,6 +656,7 @@ def seg_code(current_dir,img_p,yolov11,image_path,predicted_proba_DL,predicted_v
     plt.close('all')
 
     return imp_result, max_confidence_ML
+
 
 
 
