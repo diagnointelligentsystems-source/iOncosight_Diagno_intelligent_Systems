@@ -40,36 +40,28 @@ import threading
 hf_token = st.secrets["HF_TOKEN"]
 os.environ["HUGGINGFACE_HUB_TOKEN"] = hf_token
 ##############
-# ---------- Configuration ----------
-MEMORY_THRESHOLD = 0.9  # 80%
-CHECK_INTERVAL = 1      # seconds
+import streamlit as st
+import psutil, os
 
-def monitor_memory():
-    """Background thread to monitor memory usage and restart the app if needed."""
-    while True:
-        mem = psutil.virtual_memory()
-        mem_used_percent = mem.percent / 100
-        
-        if mem_used_percent > MEMORY_THRESHOLD:
-            # Display warning (optional)
-            print(f"⚠️ Memory usage too high ({mem.percent}%). Restarting Streamlit app...")
-            st.session_state.uploaded_file = None
-            st.session_state.processed_result = None
-            st.session_state.report_data = None
-            st.session_state.show_report = False
-            st.session_state.completed = False
-            st.session_state.clear() 
-            st.rerun()
-            # Restart the Streamlit script
-            os.execv(sys.executable, [sys.executable] + sys.argv)
-        
-        time.sleep(CHECK_INTERVAL)
+MEMORY_LIMIT_MB = 800  # ~0.8 GB for Streamlit Cloud
 
-# ---------- Start memory monitoring in background ----------
-if "memory_monitor_started" not in st.session_state:
-    thread = threading.Thread(target=monitor_memory, daemon=True)
-    thread.start()
-    st.session_state.memory_monitor_started = True
+def check_app_memory():
+    process = psutil.Process(os.getpid())
+    mem_mb = process.memory_info().rss / (1024 ** 2)
+    st.sidebar.metric("App Memory Usage (MB)", f"{mem_mb:.2f}")
+
+    if mem_mb > MEMORY_LIMIT_MB:
+        st.warning(f"⚠️ App memory too high ({mem_mb:.2f} MB). Resetting session...")
+        # Clear relevant session state
+        for key in ["uploaded_file", "processed_result", "report_data", 
+                    "show_report", "completed"]:
+            if key in st.session_state:
+                del st.session_state[key]
+        st.experimental_rerun()  # safe rerun in Streamlit
+
+# Call this at the top of your script
+check_app_memory()
+
  
 # ----------------------------
 # Deep Learning Models
