@@ -91,8 +91,15 @@ def DL_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,en
         # Usage
         eff_intermediate, inc_intermediate = get_intermediate_models(eff_model, inc_model)
         
-        eff_features = eff_intermediate.predict(np.expand_dims(img_eff, 0), verbose=0).flatten()
-        inc_features = inc_intermediate.predict(np.expand_dims(img_inc, 0), verbose=0).flatten()
+        def ensure_batch(img):
+            # If shape is (H, W, C) → add batch dimension
+            if img.ndim == 3:
+                return np.expand_dims(img, 0)
+            # If already (1, H, W, C) → return as is
+            return img
+        
+        eff_features = eff_intermediate.predict(ensure_batch(img_eff), verbose=0).flatten()
+        inc_features = inc_intermediate.predict(ensure_batch(img_inc), verbose=0).flatten()
         # Combine
         combined = np.concatenate([eff_features, inc_features])
 
@@ -292,6 +299,7 @@ def DL_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,en
     plt.close('all')
     ################3
     return predicted_proba_DL,predicted_value,img_path,image_path,current_dir,img_p
+
 
 
 
