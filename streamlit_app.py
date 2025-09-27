@@ -1294,7 +1294,11 @@ Report ID: {st.session_state.report_data['patient_id']}-{datetime.now().strftime
                 st.session_state.report_data = None
                 st.session_state.show_report = False
                 st.session_state.completed = False
-                st.session_state.clear() 
+                #st.session_state.clear() 
+                for key in ["uploaded_file", "processed_result", "report_data", 
+                        "show_report", "completed"]:
+                if key in st.session_state:
+                    del st.session_state[key]
                 st.rerun()
             else:
                 st.info("🎯 Upload an image and click 'Analyze Image' to begin new AI analysis")
