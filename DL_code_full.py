@@ -70,17 +70,29 @@ def DL_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,en
         inc_pred = inc_model.predict(img_inc, verbose=0)[0]
 
         # EfficientNet features
-        eff_layer = eff_model.layers[eff_layer_index].name
-        eff_intermediate = keras.Model(inputs=eff_model.input,
-                                       outputs=eff_model.layers[eff_layer_index].output)
-        eff_features = eff_intermediate.predict(img_eff).flatten()
-
+        #eff_layer = eff_model.layers[eff_layer_index].name
         # InceptionV3 features
-        inc_layer = inc_model.layers[inc_layer_index].name
-        inc_intermediate = keras.Model(inputs=inc_model.input,
-                                       outputs=inc_model.layers[inc_layer_index].output)
-        inc_features = inc_intermediate.predict(img_inc).flatten()
+        #inc_layer = inc_model.layers[inc_layer_index].name
+        import streamlit as st
+        import keras
+        
+        @st.cache_resource
+        def get_intermediate_models(eff_model, inc_model, eff_layer_index=-2, inc_layer_index=-2):
+            eff_intermediate = keras.Model(
+                inputs=eff_model.input,
+                outputs=eff_model.layers[eff_layer_index].output
+            )
+            inc_intermediate = keras.Model(
+                inputs=inc_model.input,
+                outputs=inc_model.layers[inc_layer_index].output
+            )
+            return eff_intermediate, inc_intermediate
 
+        # Usage
+        eff_intermediate, inc_intermediate = get_intermediate_models(eff_model, inc_model)
+        
+        eff_features = eff_intermediate.predict(img_eff).flatten()
+        inc_features = inc_intermediate.predict(img_inc).flatten()
         # Combine
         combined = np.concatenate([eff_features, inc_features])
 
@@ -277,4 +289,5 @@ def DL_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,en
     plt.close('all')
     ################3
     return predicted_proba_DL,predicted_value,img_path,image_path,current_dir,img_p
+
 
