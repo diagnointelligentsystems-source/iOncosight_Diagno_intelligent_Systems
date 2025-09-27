@@ -41,7 +41,7 @@ hf_token = st.secrets["HF_TOKEN"]
 os.environ["HUGGINGFACE_HUB_TOKEN"] = hf_token
 ##############
 # ---------- Configuration ----------
-MEMORY_THRESHOLD = 0.8  # 80%
+MEMORY_THRESHOLD = 0.9  # 80%
 CHECK_INTERVAL = 1      # seconds
 
 def monitor_memory():
@@ -53,7 +53,17 @@ def monitor_memory():
         if mem_used_percent > MEMORY_THRESHOLD:
             # Display warning (optional)
             print(f"⚠️ Memory usage too high ({mem.percent}%). Restarting Streamlit app...")
-            
+            st.session_state.uploaded_file = None
+                st.session_state.processed_result = None
+                st.session_state.report_data = None
+                st.session_state.show_report = False
+                st.session_state.completed = False
+                st.session_state.clear() 
+                for key in ["uploaded_file", "processed_result", "report_data", 
+                        "show_report", "completed"]:
+                    if key in st.session_state:
+                        del st.session_state[key]
+                st.rerun()
             # Restart the Streamlit script
             os.execv(sys.executable, [sys.executable] + sys.argv)
         
