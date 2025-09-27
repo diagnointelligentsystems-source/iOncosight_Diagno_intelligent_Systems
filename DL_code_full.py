@@ -91,8 +91,8 @@ def DL_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,en
         # Usage
         eff_intermediate, inc_intermediate = get_intermediate_models(eff_model, inc_model)
         
-        eff_features = eff_intermediate.predict(img_eff).flatten()
-        inc_features = inc_intermediate.predict(img_inc).flatten()
+        eff_features = eff_intermediate.predict(np.expand_dims(img_eff, 0), verbose=0).flatten()
+        inc_features = inc_intermediate.predict(np.expand_dims(img_inc, 0), verbose=0).flatten()
         # Combine
         combined = np.concatenate([eff_features, inc_features])
 
@@ -120,7 +120,10 @@ def DL_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,en
     print ('#****************************************', flush=True)
     print('efficientNetB3', eff_pred, 'InceptionV3', inc_pred, flush=True)
     print( '# ****************************************', flush=True)
-
+    import gc
+    del eff_features, inc_features
+    gc.collect()
+    tf.keras.backend.clear_session()
     
     #print(features_df.head())
     features_df.to_csv("./DL_model_ENB3andIncV3/combined_conv_features.csv", index=False)
@@ -289,5 +292,6 @@ def DL_code(image_path,eff_model,inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,en
     plt.close('all')
     ################3
     return predicted_proba_DL,predicted_value,img_path,image_path,current_dir,img_p
+
 
 
