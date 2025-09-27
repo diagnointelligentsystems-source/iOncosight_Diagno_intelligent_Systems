@@ -137,9 +137,9 @@ def seg_code(current_dir,img_p,yolov11,image_path,predicted_proba_DL,predicted_v
             print("⚠️ Feature was not extracted.", flush=True)
 
         # ---------- Cleanup hook ----------
-        if hook is not None:
-            hook.remove()
-            print("ℹ️ Hook removed", flush=True) 
+        #if hook is not None:
+         #   hook.remove()
+          #  print("ℹ️ Hook removed", flush=True) 
         print('ex 2', flush=True)
         ######### ML results
 
@@ -656,6 +656,7 @@ def seg_code(current_dir,img_p,yolov11,image_path,predicted_proba_DL,predicted_v
     plt.close('all')
 
     return imp_result, max_confidence_ML
+
 
 
 
