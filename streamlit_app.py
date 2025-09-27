@@ -42,15 +42,15 @@ os.environ["HUGGINGFACE_HUB_TOKEN"] = hf_token
 ##############
 import streamlit as st
 import psutil, os, threading, time
-from streamlit_autorefresh import st_autorefresh  # pip install streamlit-autorefresh
+from streamlit_autorefresh import st_autorefresh
 
 MEMORY_LIMIT_MB = 3072  # 3GB
 CHECK_INTERVAL = 2      # seconds
 
-# Auto-refresh page every 2 seconds
-st_autorefresh(interval=2000, key="memory_refresh")
+# auto refresh page every 2s
+st_autorefresh(interval=2000, key="refresh_memory")
 
-# -------------------- Background memory monitor --------------------
+# ------------------ memory monitor thread ------------------
 def monitor_memory():
     process = psutil.Process(os.getpid())
     while True:
@@ -59,7 +59,6 @@ def monitor_memory():
         st.session_state["memory_exceeded"] = mem_mb > MEMORY_LIMIT_MB
         time.sleep(CHECK_INTERVAL)
 
-# Start memory monitor thread once
 if "memory_monitor_started" not in st.session_state:
     thread = threading.Thread(target=monitor_memory, daemon=True)
     thread.start()
@@ -67,13 +66,12 @@ if "memory_monitor_started" not in st.session_state:
     st.session_state.app_memory = 0
     st.session_state.memory_exceeded = False
 
-# -------------------- Display memory --------------------
-st.sidebar.metric("App Memory Usage (MB)", f"{st.session_state.get('app_memory', 0):.2f}")
+# ------------------ main UI ------------------
+st.sidebar.metric("App Memory Usage (MB)", f"{st.session_state.get('app_memory',0):.2f}")
 
-# -------------------- Check memory limit --------------------
 if st.session_state.get("memory_exceeded", False):
     st.warning(f"⚠️ App memory too high ({st.session_state['app_memory']:.2f} MB). Resetting session...")
-    for key in ["uploaded_file", "processed_result", "report_data", "show_report", "completed"]:
+    for key in ["uploaded_file","processed_result","report_data","show_report","completed"]:
         if key in st.session_state:
             del st.session_state[key]
     st.session_state["memory_exceeded"] = False
