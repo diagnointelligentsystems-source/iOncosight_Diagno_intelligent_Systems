@@ -24,12 +24,9 @@ from tensorflow import keras
 import os
 from huggingface_hub import hf_hub_download, whoami
 import joblib
-from ultralytics import YOLO
 from datetime import datetime
 now = datetime.now()
 print(now)                           # full date & time
-import ultralytics
-print(ultralytics.__version__ , flush=True)
 import gc
 import psutil
 import sys
@@ -47,14 +44,6 @@ os.environ["HUGGINGFACE_HUB_TOKEN"] = hf_token
 # ----------------------------
 # Deep Learning Models
 # ----------------------------
-@st.cache_resource
-def load_yolo():
-    model_path = hf_hub_download(
-        repo_id="DiagnoIntelligentSytem/lung-xray-models",
-        filename="yolov11_seg_MCN_best.pt"
-    )
-    return YOLO(model_path) #if you need to use YOLO class
-
 
 @st.cache_resource
 def load_eff_model():
@@ -113,41 +102,6 @@ def load_stacked_LC_NR():
     return joblib.load(model_path)
 
 
-@st.cache_resource
-def load_sel_ens_M1():
-    model_path = hf_hub_download(
-        repo_id="DiagnoIntelligentSytem/lung-xray-models",
-        filename="1_MCN_rf_model_f_classif_fec_51_train_acc1.0_test_acc1.0.pkl"
-    )
-    return joblib.load(model_path)
-
-
-@st.cache_resource
-def load_sel_ens_M2():
-    model_path = hf_hub_download(
-        repo_id="DiagnoIntelligentSytem/lung-xray-models",
-        filename="2_MCN_rf_model_mutual_info_classif_fec_51_train_acc1.0_test_acc1.0.pkl"
-    )
-    return joblib.load(model_path)
-
-
-@st.cache_resource
-def load_sel_ens_M3():
-    model_path = hf_hub_download(
-        repo_id="DiagnoIntelligentSytem/lung-xray-models",
-        filename="3_MCN_xgb_mutual_info_classif_fec_51_train_acc1.0_test_acc1.0.pkl"
-    )
-    return joblib.load(model_path)
-
-
-@st.cache_resource
-def load_ens_MCN():
-    model_path = hf_hub_download(
-        repo_id="DiagnoIntelligentSytem/lung-xray-models",
-        filename="stacked_ensemble_model_ML_MCN.pkl"
-    )
-    return joblib.load(model_path)
-
 
 # ----------------------------
 # Scalers (use cache_data since they are small)
@@ -162,8 +116,7 @@ def load_scaler(filename: str):
 
 # ----------------------------
 # Initialize all models once
-# ----------------------------
-yolov11 = load_yolo()
+# ---------------------------- 
 eff_model = load_eff_model()
 inc_model = load_inc_model()
 
@@ -172,17 +125,11 @@ xgb_chi2_ens = load_xgb_chi2()
 rf_mi_ens = load_rf_mi()
 st_ens_LC_NR = load_stacked_LC_NR()
 
-sel_ens_M1 = load_sel_ens_M1()
-sel_ens_M2 = load_sel_ens_M2()
-sel_ens_M3 = load_sel_ens_M3()
-ens_MCN = load_ens_MCN()
+ 
 
 ens_scaler_rf_chi2 = load_scaler("scaler_ALL_FEATURE_LC_mass_other_rf_chi2_BOTH__min_max_w_fec.pkl")
 ens_scaler_xgb_chi2 = load_scaler("scaler_ALL_FEATURE_2_LC_mass_other_xgb_chi2__min_max_K_{k}.pkl")
 ens_scaler_rf_mi = load_scaler("scaler_ALL_FEATURE_LC_mass_other_rf_mutual_info_classif_BOTH__min_max_w_fec.pkl")
-scaled_ens_M1 = load_scaler("1_scaler_ALL_FEATURE_5m_SCORE_rf_f_classif_BOTH__min_max_w_fec.pkl")
-scaled_ens_M2 = load_scaler("2_scaler_ALL_FEATURE_5m_SCORE_rf_mutual_info_classif_BOTH__min_max_w_fec.pkl")
-scaled_ens_M3 = load_scaler("3_scaler_ALL_FEATURE_3_MCN_xgb_mutual_info_classif__min_max_K_{k}.pkl")
 
 # ----------------------------
 # Optional: Check token
@@ -1136,7 +1083,7 @@ with col2:
         # Change working directory to that path
         os.chdir(current_dir)
         folder_path = './output_YOLOV11'  # Change this to your target folder
-        folder_path_full = './output_YOLOV11/V11_SEG_PRED.png'
+        folder_path_full = './result.jpg'
         # Delete all files in the folder
         for filename in os.listdir(folder_path):
             file_path = os.path.join(folder_path_full)#folder_path, filename)
@@ -1199,7 +1146,7 @@ with col2:
         from DL_model_ENB3andIncV3_code_and_seg_main import full_code
 
         imp_result,max_confidence_ML = full_code(output_path, eff_model, inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,ens_scaler_rf_chi2,ens_scaler_xgb_chi2,ens_scaler_rf_mi,
-                                                st_ens_LC_NR,sel_ens_M1,sel_ens_M2,sel_ens_M3,scaled_ens_M1,scaled_ens_M2,scaled_ens_M3,ens_MCN,yolov11)
+                                                st_ens_LC_NR)
 
         print('final_impression', imp_result, flush=True)
         #print('output image path :', imp_image_out)
