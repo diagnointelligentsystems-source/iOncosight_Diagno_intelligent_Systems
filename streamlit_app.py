@@ -1159,9 +1159,12 @@ with col2:
             imp_result,max_confidence_ML = full_code(output_path, eff_model, inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,ens_scaler_rf_chi2,ens_scaler_xgb_chi2,ens_scaler_rf_mi,
                                                          st_ens_LC_NR)
           except Exception as e:
-            st.error(f"⚠️ App crashed with error: {e}. Retrying in 5s...")
-            time.sleep(5)
-            st.experimental_rerun()
+            st.error(f"⚠️ App crashed with error: {e}. Retrying in 10s...")
+            time.sleep(10)
+            st.cache_data.clear()
+            st.cache_resource.clear()
+            st.session_state.clear() 
+            st.rerun()
           print('final_impression', imp_result, flush=True)
           #print('output image path :', imp_image_out)
           imp=imp_result
