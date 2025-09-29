@@ -1124,12 +1124,19 @@ with col2:
         TARGET_SIZE = 1024
 
         # Convert NumPy array to PIL Image
-        if len(img.shape) == 2:  # grayscale
+        if len(img.shape) == 2:  
+            # grayscale → convert to RGB
             img_pil = Image.fromarray(img).convert("RGB")
-        elif img.shape[2] == 3:
-            img_pil = Image.fromarray(img)
-        elif img.shape[2] == 4:  # RGBA
-            img_pil = Image.fromarray(img[:, :, :3])
+        
+        elif len(img.shape) == 3:
+            if img.shape[2] == 3:  
+                # already RGB
+                img_pil = Image.fromarray(img)
+            elif img.shape[2] == 4:  
+                # RGBA → drop alpha channel
+                img_pil = Image.fromarray(img[:, :, :3])
+            else:
+                raise ValueError(f"Unexpected channel size: {img.shape[2]}")
         else:
             raise ValueError(f"Unexpected image shape: {img.shape}")
 
