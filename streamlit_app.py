@@ -1151,7 +1151,7 @@ with col2:
           # Save as PNG
           output_path = os.path.join("./images/input.png")
           img_resized.save(output_path)
-          try:
+          try: 
             # your main app code
             import DL_model_ENB3andIncV3_code_and_seg_main
             from DL_model_ENB3andIncV3_code_and_seg_main import full_code
