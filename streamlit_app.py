@@ -677,8 +677,8 @@ class ImageProcessor:
                 print('PhotometricInterpretation',dicom_data.PhotometricInterpretation)
                 if dicom_data.PhotometricInterpretation == "MONOCHROME1":
                     image = np.amax(image) - image
-                if dicom_data.PhotometricInterpretation == "MONOCHROME2":
-                    image = np.amax(image) - image
+                #if dicom_data.PhotometricInterpretation == "MONOCHROME2":
+                 #   image = np.amax(image) - image
 
             # Normalize to 0-255 range
             image = image - np.min(image)
