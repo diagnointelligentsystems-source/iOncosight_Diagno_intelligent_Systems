@@ -1090,10 +1090,10 @@ with col2:
           for filename in os.listdir(folder_path):
               file_path = os.path.join(folder_path_full)#folder_path, filename)
               try:
-                  if os.path.isfile(file_path):
-                      os.remove(file_path)
+               if os.path.isfile(file_path):
+                os.remove(file_path)
               except Exception as e:
-                  print(f"Error deleting {file_path}: {e}", flush=True)
+               print(f"Error deleting {file_path}: {e}", flush=True)
           ######
           import random
           # import cv2
