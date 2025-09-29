@@ -1189,9 +1189,8 @@ with col2:
           )
           SessionManager.update_stats()
           st.rerun()
-       except Exception as e:
-          st.error(f"⚠️ The app crashed with error: {e}")
-      
+        except Exception as e:
+          st.error(f"⚠️ The app crashed with error: {e}")     
           # Retry logic
           st.warning("Retrying in 5 seconds...")
           time.sleep(5)  
