@@ -674,7 +674,7 @@ class ImageProcessor:
 
             # Handle photometric interpretation
             if hasattr(dicom_data, 'PhotometricInterpretation'):
-             print('PhotometricInterpretation',dicom_data.PhotometricInterpretation)
+                print('PhotometricInterpretation',dicom_data.PhotometricInterpretation)
                 if dicom_data.PhotometricInterpretation == "MONOCHROME1":
                     image = np.amax(image) - image
                 if dicom_data.PhotometricInterpretation == "MONOCHROME2":
