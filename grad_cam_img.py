@@ -5,6 +5,8 @@ def grad_Cam_1(image_path,img_path,eff_model):
     import numpy as np          # for array operations
     import tensorflow as tf     # for GradientTape and model operations
     from tensorflow import keras  # for image preprocessing (load_img, img_to_array)
+    from keras import backend as K
+    K.clear_session()  # clear old graphs
 
     if 1==1:
         img = img_p = cv2.imread(image_path)
@@ -74,6 +76,7 @@ def grad_Cam_1(image_path,img_path,eff_model):
         # Copy image
     shutil.copy("./output_YOLOV11/Grad_cam_PRED.png", "./result.jpg")
     return img_p
+
 
 
 
