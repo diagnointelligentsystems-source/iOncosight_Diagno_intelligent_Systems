@@ -1074,120 +1074,130 @@ with col2:
 
         progress_bar = st.progress(0)
         status_text = st.empty()
-        ##############################################################################
-        import os
-
-        # os.chdir(r'F:/project')
-        # Get directory where current script is located
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-
-        # Change working directory to that path
-        os.chdir(current_dir)
-        folder_path = './output_YOLOV11'  # Change this to your target folder
-        folder_path_full = './result.jpg'
-        # Delete all files in the folder
-        for filename in os.listdir(folder_path):
-            file_path = os.path.join(folder_path_full)#folder_path, filename)
-            try:
-                if os.path.isfile(file_path):
-                    os.remove(file_path)
-            except Exception as e:
-                print(f"Error deleting {file_path}: {e}", flush=True)
-        ######
-        import random
-        # import cv2
-        import numpy as np
-        import matplotlib.pyplot as plt
-        import pydicom
-        from pydicom.pixel_data_handlers.util import apply_voi_lut
-
-        import os
-        import io
-        # import cv2
-        from PIL import Image
-
-        from pydicom.uid import ExplicitVRLittleEndian
-        import time
-
-        start_time = time.time()
-
-        # dicom = pydicom.dcmread(BytesIO(uploaded_file.read()))
-        # pixel_array = apply_voi_lut(dicom.pixel_array, dicom)
-        image, dicom_data = ImageProcessor.load_image(uploaded_file)
-        pixel_array = np.array(image)
-        img = pixel_array
-        img = img.astype(np.float32)
-        img = (img - np.min(img)) / (np.max(img) - np.min(img))
-        img = (img * 255).astype(np.uint8)
-        from PIL import Image, ImageDraw, ImageFont
-
-        TARGET_SIZE = 1024
-
-        # Convert NumPy array to PIL Image
-        if len(img.shape) == 2:  
-            # grayscale → convert to RGB
-            img_pil = Image.fromarray(img).convert("RGB")
-        
-        elif len(img.shape) == 3:
-            if img.shape[2] == 3:  
-                # already RGB
-                img_pil = Image.fromarray(img)
-            elif img.shape[2] == 4:  
-                # RGBA → drop alpha channel
-                img_pil = Image.fromarray(img[:, :, :3])
-            else:
-                raise ValueError(f"Unexpected channel size: {img.shape[2]}")
-        else:
-            raise ValueError(f"Unexpected image shape: {img.shape}")
-
-
-        # Resize
-        img_resized = img_pil.resize((TARGET_SIZE, TARGET_SIZE), Image.LANCZOS)
-
-        # Get original size
-        w0, h0 = img_pil.size
-
-        # Save as PNG
-        output_path = os.path.join("./images/input.png")
-        img_resized.save(output_path)
         try:
-          # your main app code
-          import DL_model_ENB3andIncV3_code_and_seg_main
-          from DL_model_ENB3andIncV3_code_and_seg_main import full_code
-               
-          imp_result,max_confidence_ML = full_code(output_path, eff_model, inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,ens_scaler_rf_chi2,ens_scaler_xgb_chi2,ens_scaler_rf_mi,
-                                                       st_ens_LC_NR)
-        except Exception as e:
-          st.error(f"⚠️ App crashed with error: {e}. Retrying in 5s...")
-          time.sleep(5)
-          st.experimental_rerun()
-        print('final_impression', imp_result, flush=True)
-        #print('output image path :', imp_image_out)
-        imp=imp_result
-        max_confidence_ML=max_confidence_ML
-        Risk_level =[]# Risk_level  # rish level
-        Predicted_class_ML=impression = imp  ### impression text
-        """ Patient information"""
-        Patient_ID = uploaded_file.name
-        Patient_Name = "NA"
-        Patient_Age = "NA"
-        Patient_Sex = "NA"
-
-        end_time = time.time()
-        print(f"⏱️ Processing time: {end_time - start_time:.2f} seconds", flush=True)
-        processing_time = f"{end_time - start_time:.2f} "
-        ##############################################################################
-
-        # Simulate processing completion with enhanced results
-        st.session_state.processing = False
-        st.session_state.completed = True
-        st.session_state.processed_result = "result.jpg"
-        st.session_state.report_data = AIAnalysisEngine.generate_realistic_report(
-            Patient_ID, Predicted_class_ML, impression, max_confidence_ML,
-            Risk_level, processing_time
-        )
-        SessionManager.update_stats()
-        st.rerun()
+          ##############################################################################
+          import os
+  
+          # os.chdir(r'F:/project')
+          # Get directory where current script is located
+          current_dir = os.path.dirname(os.path.abspath(__file__))
+  
+          # Change working directory to that path
+          os.chdir(current_dir)
+          folder_path = './output_YOLOV11'  # Change this to your target folder
+          folder_path_full = './result.jpg'
+          # Delete all files in the folder
+          for filename in os.listdir(folder_path):
+              file_path = os.path.join(folder_path_full)#folder_path, filename)
+              try:
+                  if os.path.isfile(file_path):
+                      os.remove(file_path)
+              except Exception as e:
+                  print(f"Error deleting {file_path}: {e}", flush=True)
+          ######
+          import random
+          # import cv2
+          import numpy as np
+          import matplotlib.pyplot as plt
+          import pydicom
+          from pydicom.pixel_data_handlers.util import apply_voi_lut
+  
+          import os
+          import io
+          # import cv2
+          from PIL import Image
+  
+          from pydicom.uid import ExplicitVRLittleEndian
+          import time
+  
+          start_time = time.time()
+  
+          # dicom = pydicom.dcmread(BytesIO(uploaded_file.read()))
+          # pixel_array = apply_voi_lut(dicom.pixel_array, dicom)
+          image, dicom_data = ImageProcessor.load_image(uploaded_file)
+          pixel_array = np.array(image)
+          img = pixel_array
+          img = img.astype(np.float32)
+          img = (img - np.min(img)) / (np.max(img) - np.min(img))
+          img = (img * 255).astype(np.uint8)
+          from PIL import Image, ImageDraw, ImageFont
+  
+          TARGET_SIZE = 1024
+  
+          # Convert NumPy array to PIL Image
+          if len(img.shape) == 2:  
+              # grayscale → convert to RGB
+              img_pil = Image.fromarray(img).convert("RGB")
+          
+          elif len(img.shape) == 3:
+              if img.shape[2] == 3:  
+                  # already RGB
+                  img_pil = Image.fromarray(img)
+              elif img.shape[2] == 4:  
+                  # RGBA → drop alpha channel
+                  img_pil = Image.fromarray(img[:, :, :3])
+              else:
+                  raise ValueError(f"Unexpected channel size: {img.shape[2]}")
+          else:
+              raise ValueError(f"Unexpected image shape: {img.shape}")
+  
+  
+          # Resize
+          img_resized = img_pil.resize((TARGET_SIZE, TARGET_SIZE), Image.LANCZOS)
+  
+          # Get original size
+          w0, h0 = img_pil.size
+  
+          # Save as PNG
+          output_path = os.path.join("./images/input.png")
+          img_resized.save(output_path)
+          try:
+            # your main app code
+            import DL_model_ENB3andIncV3_code_and_seg_main
+            from DL_model_ENB3andIncV3_code_and_seg_main import full_code
+                 
+            imp_result,max_confidence_ML = full_code(output_path, eff_model, inc_model,rf_chi2_ens,xgb_chi2_ens,rf_mi_ens,ens_scaler_rf_chi2,ens_scaler_xgb_chi2,ens_scaler_rf_mi,
+                                                         st_ens_LC_NR)
+          except Exception as e:
+            st.error(f"⚠️ App crashed with error: {e}. Retrying in 5s...")
+            time.sleep(5)
+            st.experimental_rerun()
+          print('final_impression', imp_result, flush=True)
+          #print('output image path :', imp_image_out)
+          imp=imp_result
+          max_confidence_ML=max_confidence_ML
+          Risk_level =[]# Risk_level  # rish level
+          Predicted_class_ML=impression = imp  ### impression text
+          """ Patient information"""
+          Patient_ID = uploaded_file.name
+          Patient_Name = "NA"
+          Patient_Age = "NA"
+          Patient_Sex = "NA"
+  
+          end_time = time.time()
+          print(f"⏱️ Processing time: {end_time - start_time:.2f} seconds", flush=True)
+          processing_time = f"{end_time - start_time:.2f} "
+          ##############################################################################
+  
+          # Simulate processing completion with enhanced results
+          st.session_state.processing = False
+          st.session_state.completed = True
+          st.session_state.processed_result = "result.jpg"
+          st.session_state.report_data = AIAnalysisEngine.generate_realistic_report(
+              Patient_ID, Predicted_class_ML, impression, max_confidence_ML,
+              Risk_level, processing_time
+          )
+          SessionManager.update_stats()
+          st.rerun()
+       except Exception as e:
+          st.error(f"⚠️ The app crashed with error: {e}")
+      
+          # Retry logic
+          st.warning("Retrying in 5 seconds...")
+          time.sleep(5)  
+          st.session_state.processing = False
+          st.session_state.completed = False
+          st.experimental_rerun()  # reruns the script from the top  
 
     elif st.session_state.processed_result:
         st.success("✅ Analysis completed successfully!")
