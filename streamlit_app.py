@@ -1173,7 +1173,7 @@ with col2:
         img = (img * 255).astype(np.uint8)
         from PIL import Image, ImageDraw, ImageFont
 
-        TARGET_SIZE = 300 #1024
+        TARGET_SIZE =1024
 
         # Convert NumPy array to PIL Image
         if len(img.shape) == 2:  # grayscale
